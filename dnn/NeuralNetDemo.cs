@@ -28,7 +28,7 @@
 
 namespace dnn
 {
-    using System.Linq;
+    using System.Collections.Generic;
     using System.Text;
 
     class NueralNetDemo
@@ -47,73 +47,55 @@ namespace dnn
             Console.WriteLine(" 6.3, 3.3, 6.0, 2.5, Iris virginica");
             Console.WriteLine(" ......\n");
 
-            var sdata = System.IO.File.ReadAllText("irisdata.txt");
-            var svalues = sdata.Split(new []{',','\n','\r'}, StringSplitOptions.RemoveEmptyEntries).Select(sValue => sValue.Trim()).ToArray();
-
-            var allData = new double[svalues.Length/7][];
-
-            var i = 0;           
-            while (i < svalues.Length)
-            {
-                var row = new double[7];
-                allData[i / 7] = row;
-
-                for (var j = 0; j < 7; j++)
-                {
-                    row[j] = double.Parse(svalues[i++]);
-                }              
-            }          
+            var allData = new TrainingData();
+            allData.LoadData("irisdata.txt", 4, 3);
             
             var sb = new StringBuilder();
-            ArrayFormatter.Matrix(sb, allData, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
+            ArrayFormatter.Matrix(sb, allData.Data, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
             Console.WriteLine(sb.ToString());
 
-            Console.WriteLine("Creating 80% training and 20% test data matrices");
-            double[][] trainData;
-            double[][] testData;
-            MakeTrainTest(allData, out trainData, out testData);
+            Console.WriteLine("Creating 80% training and 20% test data matrices");         
+            allData.Split(0.8);
             
             sb.Clear();
-            ArrayFormatter.Matrix(sb, trainData, 5, 1, true, "\nFirst 5 rows of training data:");
+            ArrayFormatter.Matrix(sb, allData.TrainData, 5, 1, true, "\nFirst 5 rows of training data:");
             Console.WriteLine(sb.ToString());
             sb.Clear();
-            ArrayFormatter.Matrix(sb, testData, 3, 1, true, "\nFirst 3 rows of test data:");
+            ArrayFormatter.Matrix(sb, allData.TestData, 3, 1, true, "\nFirst 3 rows of test data:");
             Console.WriteLine(sb.ToString());
 
-            Normalize(trainData, new int[] { 0, 1, 2, 3 });
-            Normalize(testData, new int[] { 0, 1, 2, 3 });
+            allData.NormalizeInputs();            
             
             sb.Clear();
-            ArrayFormatter.Matrix(sb, trainData, 5, 1, true, "\nFirst 5 rows of normalized training data:");
+            ArrayFormatter.Matrix(sb, allData.TrainData, 5, 1, true, "\nFirst 5 rows of normalized training data:");
             Console.WriteLine(sb.ToString());          
             sb.Clear();
-            ArrayFormatter.Matrix(sb, testData, 3, 1, true, "First 3 rows of normalized test data:");
+            ArrayFormatter.Matrix(sb, allData.TestData, 3, 1, true, "First 3 rows of normalized test data:");
             Console.Write(sb.ToString());
 
             Console.WriteLine("\nBuilding Neural Networks");
-            Console.Write("Hard-coded tanh function for input-to-hidden and softmax for ");
-            Console.WriteLine("hidden-to-output activations");
+            Console.WriteLine("Hard-coded tanh function for input-to-hidden and softmax for hidden-to-output activations");
 
-            var network = BuildBackPropDnn(trainData);
-            network = BuildPsoDnn(trainData);
+            var networks = new List<INeuralNetwork> { BuildBackPropDnn(), BuildPsoDnn() };
 
-            var trainAcc = network.Accuracy(trainData);
-            var testAcc = network.Accuracy(testData);                 
-            Console.WriteLine("PSO Final neural network weights and bias values:");
-            Console.WriteLine(network.WeightsAsString());
-            Console.WriteLine("\nPSO Accuracy on training data = " + trainAcc.ToString("F4"));
-            Console.WriteLine("\nPSO Accuracy on test data = " + testAcc.ToString("F4"));
-            Console.WriteLine("\n\nFinal DNN: {0}", network);
+            foreach (var network in networks)
+            {
+                Console.WriteLine("\n\nTraining Network: " + network.GetType());
+                network.Train(allData.TrainData);
+                Console.WriteLine("Training complete");
+                var trainAcc = network.Accuracy(allData.TrainData);
+                var testAcc = network.Accuracy(allData.TestData);               
+                Console.WriteLine("\nAccuracy on training data = " + trainAcc.ToString("F4"));
+                Console.WriteLine("\nAccuracy on test data = " + testAcc.ToString("F4"));
+                Console.WriteLine("\n\nFinal Network: {0}", network);
+            }        
 
             Console.WriteLine("\nEnd Build 2013 neural network demo\n");
             Console.ReadLine();
+        }      
 
-        } // Main
-
-        static INeuralNetwork BuildPsoDnn(double[][] trainData)
-        {
-            var rng = new Random(0);
-            
+        static INeuralNetwork BuildPsoDnn()
+        {           
             var props = new DnnProperties {
                               InitWeightMin = -0.1,
                               InitWeightMax = 0.1,
@@ -137,12 +119,10 @@ namespace dnn
                                    ParticleProps = particleProps
                                };
 
-            var dnnPso = new PsoNetwork(netProps, props, rng);
-            dnnPso.Build(trainData);
-            return dnnPso;
+            return new PsoNetwork(netProps, props, new Random(0));                       
         }
 
-        static INeuralNetwork BuildBackPropDnn(double[][] trainData)
+        static INeuralNetwork BuildBackPropDnn()
         {                        
             var props = new DnnProperties {
                 InitWeightMin = -0.1,
@@ -151,86 +131,18 @@ namespace dnn
                 NumInput = 4,
                 NumOutput = 3
             };
+
+            var backProps = new BackPropProperties
+                                {
+                                    learnRate = 0.05,
+                                    maxEprochs = 2000,
+                                    momentum = 0.00,
+                                    weightDecay = 0.000,
+                                    mseStopCondition = 0.020
+                                };
                   
-            var nn = new BackPropNetwork(props, new Random(0));      
-
-            int maxEpochs = 2000;
-            double learnRate = 0.05;
-            double momentum = 0.00;
-            double weightDecay = 0.000;
-            Console.WriteLine("Setting maxEpochs = 2000, learnRate = 0.05, momentum = 0.01, weightDecay = 0.0001");
-            Console.WriteLine("Training has hard-coded mean squared error < 0.020 stopping condition");
-
-            Console.WriteLine("\nBeginning training using incremental back-propagation\n");
-            nn.Train(trainData, maxEpochs, learnRate, momentum, weightDecay);
-            Console.WriteLine("Training complete");
-            return nn;
-        }
-
-        static void MakeTrainTest(double[][] allData, out double[][] trainData, out double[][] testData)
-        {
-            // split allData into 80% trainData and 20% testData
-            Random rnd = new Random(0);
-            int totRows = allData.Length;
-            int numCols = allData[0].Length;
-
-            int trainRows = (int)(totRows * 0.80); // hard-coded 80-20 split
-            int testRows = totRows - trainRows;
-
-            trainData = new double[trainRows][];
-            testData = new double[testRows][];
-
-            int[] sequence = new int[totRows]; // create a random sequence of indexes
-            for (int i = 0; i < sequence.Length; ++i)
-                sequence[i] = i;
-
-            for (int i = 0; i < sequence.Length; ++i)
-            {
-                int r = rnd.Next(i, sequence.Length);
-                int tmp = sequence[r];
-                sequence[r] = sequence[i];
-                sequence[i] = tmp;
-            }
-
-            int si = 0; // index into sequence[]
-            int j = 0; // index into trainData or testData
-
-            for (; si < trainRows; ++si) // first rows to train data
-            {
-                trainData[j] = new double[numCols];
-                int idx = sequence[si];
-                Array.Copy(allData[idx], trainData[j], numCols);
-                ++j;
-            }
-
-            j = 0; // reset to start of test data
-            for (; si < totRows; ++si) // remainder to test data
-            {
-                testData[j] = new double[numCols];
-                int idx = sequence[si];
-                Array.Copy(allData[idx], testData[j], numCols);
-                ++j;
-            }
-        } // MakeTrainTest
-
-        static void Normalize(double[][] dataMatrix, int[] cols)
-        {
-            // normalize specified cols by computing (x - mean) / sd for each value
-            foreach (int col in cols)
-            {
-                double sum = 0.0;
-                for (int i = 0; i < dataMatrix.Length; ++i)
-                    sum += dataMatrix[i][col];
-                double mean = sum / dataMatrix.Length;
-                sum = 0.0;
-                for (int i = 0; i < dataMatrix.Length; ++i)
-                    sum += (dataMatrix[i][col] - mean) * (dataMatrix[i][col] - mean);
-                // thanks to Dr. W. Winfrey, Concord Univ., for catching bug in original code
-                double sd = Math.Sqrt(sum / (dataMatrix.Length - 1));
-                for (int i = 0; i < dataMatrix.Length; ++i)
-                    dataMatrix[i][col] = (dataMatrix[i][col] - mean) / sd;
-            }
-        }        
-    } // class Program   
-} // ns
+            return  new BackPropNetwork(props, backProps, new Random(0));                                       
+        }               
+    } 
+}
 

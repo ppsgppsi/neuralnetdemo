@@ -136,14 +136,7 @@ namespace dnn
             for (int i = 0; i < this.oBiases.Length; ++i)
                 result[k++] = this.oBiases[i];
             return result;
-        }
-
-        public string WeightsAsString()
-        {
-            var sb = new StringBuilder();           
-            ArrayFormatter.Vector(sb, this.Weights(), 10, 3, true, null);
-            return sb.ToString();
-        }
+        }   
 
         public override string ToString()
         {

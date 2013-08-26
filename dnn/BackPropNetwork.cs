@@ -3,9 +3,19 @@
     using System;
     using System.Text;
 
+    public class BackPropProperties
+    {
+        public int maxEprochs { get; set; }
+        public double learnRate { get; set; }
+        public double momentum { get; set; }
+        public double weightDecay { get; set; }
+        public double mseStopCondition { get; set; }
+    }
+
     public class BackPropNetwork : INeuralNetwork
     {
         private Random rnd;
+        private BackPropProperties backProps;
 
         // back-prop specific arrays (these could be local to method UpdateWeights)
         private double[] oGrads; // output gradients for back-propagation
@@ -18,9 +28,10 @@
         private double[] oPrevBiasesDelta;
 
 
-        public BackPropNetwork(DnnProperties props, Random rnd)
+        public BackPropNetwork(DnnProperties props, BackPropProperties backProps, Random rnd)
         {
             this.rnd = rnd; // for Shuffle()
+            this.backProps = backProps;
 
             this.Dnn = new Dnn(props, rnd);
 
@@ -39,12 +50,7 @@
         public double Accuracy(double[][] data)
         {
             return this.Dnn.Accuracy(data);
-        }
-
-        public string WeightsAsString()
-        {
-            return this.Dnn.Data.WeightsAsString();
-        }
+        }     
 
         public override string ToString() // yikes
         {
@@ -147,8 +153,7 @@
 
         // ----------------------------------------------------------------------------------------
 
-        public void Train(double[][] trainData, int maxEprochs, double learnRate, double momentum,
-              double weightDecay)
+        public void Train(double[][] trainData)
         {
             var props = this.Dnn.Data.Props;
             // train a back-prop style NN classifier using learning rate and momentum
@@ -162,10 +167,10 @@
                 sequence[i] = i;
 
 
-            while (epoch < maxEprochs)
+            while (epoch < this.backProps.maxEprochs)
             {
                 double mse = MeanSquaredError(trainData);
-                if (mse < 0.020) break; // consider passing value in as parameter
+                if (mse < this.backProps.mseStopCondition) break; // consider passing value in as parameter
                 //if (mse < 0.001) break; // consider passing value in as parameter
 
                 Shuffle(this.rnd, sequence); // visit each training data in random order
@@ -174,7 +179,7 @@
                     int idx = sequence[i];
                     Array.Copy(trainData[idx], props.NumInput, tValues, 0, props.NumOutput);
                     this.Dnn.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
-                    UpdateWeights(tValues, learnRate, momentum, weightDecay); // find better weights
+                    UpdateWeights(tValues, this.backProps.learnRate, this.backProps.momentum, this.backProps.weightDecay); // find better weights
                 } // each training tuple
                 ++epoch;
             }

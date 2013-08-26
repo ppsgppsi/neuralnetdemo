@@ -15,7 +15,7 @@
 
             for (int i = 0; i < vector.Length; ++i)
             {
-                if (i % valsPerRow == 0)
+                if ((valsPerRow > 0) && (i % valsPerRow == 0))
                 {
                     sb.Append("\n");
                 }

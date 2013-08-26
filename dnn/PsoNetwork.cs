@@ -1,7 +1,8 @@
 ﻿namespace dnn
 {
     using System;
-    
+    using System.Text;
+
     public class PsoNetworkProperties
     {
         public int NumNetworks { get; set; }
@@ -22,7 +23,7 @@
             this.DnnProps = props;
             this.rng = rng;
         }
-        public Dnn Build(double[][] trainData)
+        public void Train(double[][] trainData)
         {           
             var particles = new PsoParticle[NetworkProps.NumNetworks];
 
@@ -66,8 +67,7 @@
                         break;
                     }
                 }                           
-            }
-            return this.Network;
+            }            
         }
 
         public Dnn Network { get; private set; }
@@ -77,9 +77,9 @@
             return Network.Accuracy(data);
         }
 
-        public string WeightsAsString()
+        public override string ToString() // yikes
         {
-            return Network.Data.WeightsAsString();
+            return this.Network.ToString();           
         }
     }
 }
