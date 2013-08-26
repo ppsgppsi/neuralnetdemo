@@ -244,16 +244,14 @@ namespace BuildNeuralNetworkDemo
         static void RunPsoDnn(double[][] trainData, double[][] testData)
         {
             var rng = new Random(0);
-
-            var dnnPso = new PsoNetwork();
+            
             var props = new DnnProperties()
                           {
                               InitWeightMin = -0.1,
                               InitWeightMax = 0.1,
                               NumHidden = 2,
                               NumInput = 4,
-                              NumOutput = 3,
-                              Rng = rng
+                              NumOutput = 3
                           };
 
             var particleProps = new ParticleProperties()
@@ -269,19 +267,21 @@ namespace BuildNeuralNetworkDemo
                                {
                                    DesiredAccuracy = 0.98,
                                    Iterations = 1000,
-                                   NumNetworks = 11,
-                                   Rng = rng,
+                                   NumNetworks = 11,                                   
                                    ParticleProps = particleProps
                                };
 
-            dnnPso.BuildNetwork(netProps, props, trainData);            
-            var trainAcc = dnnPso.Network.Accuracy(trainData);
-            var testAcc = dnnPso.Network.Accuracy(testData);
-            double[] weights = dnnPso.Network.Data.GetWeights();
+            var dnnPso = new PsoNetwork(netProps, props, rng);
+            var network = dnnPso.Build(trainData);
+            
+            var trainAcc = network.Accuracy(trainData);
+            var testAcc = network.Accuracy(testData);
+            double[] weights = network.Data.GetWeights();
             Console.WriteLine("PSO Final neural network weights and bias values:");
             ShowVector(weights, 10, 3, true);
             Console.WriteLine("\nPSO Accuracy on training data = " + trainAcc.ToString("F4"));
-            Console.WriteLine("\nPSO Accuracy on test data = " + testAcc.ToString("F4"));            
+            Console.WriteLine("\nPSO Accuracy on test data = " + testAcc.ToString("F4"));
+            Console.WriteLine("\n\nFinal DNN: {0}", network);
         }
 
         static void RunBackPropDnn(double[][] trainData, double[][] testData)

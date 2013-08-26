@@ -7,20 +7,28 @@
         public int NumNetworks { get; set; }
         public int Iterations { get; set; }
         public double DesiredAccuracy { get; set; }
-        public ParticleProperties ParticleProps { get; set;}
-        public Random Rng { get; set; }               
+        public ParticleProperties ParticleProps { get; set;}                   
     }
 
     public class PsoNetwork
-    {        
-        public Dnn BuildNetwork(PsoNetworkProperties netProps, DnnProperties props, double[][] trainData)
-        {           
-            var particles = new PsoParticle[netProps.NumNetworks];            
+    {
+        public PsoNetworkProperties NetworkProps { get; private set; }
+        public DnnProperties DnnProps { get; private set; }
+        private Random rng;
 
-            for (int i = 0; i < netProps.NumNetworks; i++)
-            {
-                var data = new DnnData(props);                  
-                particles[i] = new PsoParticle(new Dnn(data), netProps.ParticleProps, netProps.Rng);
+        public PsoNetwork(PsoNetworkProperties netProps, DnnProperties props, Random rng)
+        {
+            this.NetworkProps = netProps;
+            this.DnnProps = props;
+            this.rng = rng;
+        }
+        public Dnn Build(double[][] trainData)
+        {           
+            var particles = new PsoParticle[NetworkProps.NumNetworks];
+
+            for (int i = 0; i < NetworkProps.NumNetworks; i++)
+            {                
+                particles[i] = new PsoParticle(new Dnn(this.DnnProps, this.rng), NetworkProps.ParticleProps, this.rng);
             }           
 
             var foundNetwork = false;            
@@ -36,8 +44,8 @@
                     bestAccuracy = accuracy;
                 }
             }
-      
-            for (int i = 0; i < netProps.Iterations; i++)
+
+            for (int i = 0; i < NetworkProps.Iterations && !foundNetwork; i++)
             {
                 foreach (var particle in particles)
                 {
@@ -52,16 +60,12 @@
                         this.Network = particles[p].Best.Clone();                       
                         bestAccuracy = accuracy;                    
                     }
-                    if (accuracy > netProps.DesiredAccuracy)
+                    if (accuracy > NetworkProps.DesiredAccuracy)
                     {
                         foundNetwork = true;
                         break;
                     }
-                }
-                if (foundNetwork)
-                {
-                    break;
-                }                
+                }                           
             }
             return this.Network;
         }

@@ -8,8 +8,7 @@ namespace dnn
         public int NumHidden { get; set; }
         public int NumOutput { get; set; }
         public double InitWeightMin { get; set; }
-        public double InitWeightMax { get; set; }
-        public Random Rng { get; set; }
+        public double InitWeightMax { get; set; }        
 
         public DnnProperties Clone()
         {

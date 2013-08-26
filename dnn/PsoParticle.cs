@@ -13,22 +13,24 @@ namespace dnn
 
     public class PsoParticle
     {
-        private double bestAccuracy = 0.0;
+        private double bestAccuracy;
         private readonly double[] velocities;
 
-        private ParticleProperties props;
+        private readonly ParticleProperties props;
 
         private readonly Random rnd;
 
         public PsoParticle(Dnn dnn, ParticleProperties props, Random rnd)
         {
+            this.bestAccuracy = 0.0;
             this.Network = dnn;
-            var data = dnn.Data;
+            var data = dnn.Data;            
+            this.props = props;
+            this.rnd = rnd;
+
             var numvelocities = /*weights: */(data.Props.NumInput * data.Props.NumHidden) + (data.Props.NumHidden * data.Props.NumOutput) /*bias: */ + data.Props.NumHidden + data.Props.NumOutput;
             velocities = new double[numvelocities];
             Array.Clear(velocities, 0, numvelocities);
-            this.props = props;
-            this.rnd = rnd;
         }
 
         private Dnn Network { get; set; }

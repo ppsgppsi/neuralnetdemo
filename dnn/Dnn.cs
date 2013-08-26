@@ -5,9 +5,15 @@
 
     public class Dnn
     {                 
-        public Dnn(DnnData dnnData)
+        public Dnn(DnnProperties props, Random rng)
         {
-            this.Data = dnnData;
+            this.Data = new DnnData(props);
+            this.Data.InitializeWeights(rng, props.InitWeightMin, props.InitWeightMax);
+        }
+
+        private Dnn(DnnData data)
+        {
+            this.Data = data;
         }
 
         public DnnData Data { get; private set; }
@@ -40,19 +46,19 @@
             sb.Append("\n\n");
         }
 
-        public override string ToString() // yikes
+        public override string ToString()
         {
             var sb = new StringBuilder();           
             sb.Append("===============================\n");
             sb.Append("numInput = " + this.Data.Props.NumInput + " numHidden = " + this.Data.Props.NumHidden + " numOutput = " + this.Data.Props.NumOutput + "\n\n");
 
-            ArrayToString(sb, "F2", "inputs:", this.Data.inputs);            
+            //ArrayToString(sb, "F2", "inputs:", this.Data.inputs);            
             MatrixToString(sb, "ihWeights:", this.Data.ihWeights);          
-            ArrayToString(sb, "F4", "hBiases:", this.Data.hBiases);
-            ArrayToString(sb, "F4", "hOutputs:", this.Data.hOutputs);
+            ArrayToString(sb, "F4", "hBiases:", this.Data.hBiases);            
+            //ArrayToString(sb, "F4", "hOutputs:", this.Data.hOutputs);           
             MatrixToString(sb, "hoWeights:", this.Data.hoWeights);
             ArrayToString(sb, "F4", "hBiases:", this.Data.oBiases);
-            ArrayToString(sb, "F4", "outputs:", this.Data.outputs);
+            //ArrayToString(sb, "F4", "outputs:", this.Data.outputs);          
             sb.Append("===============================\n");
             return sb.ToString();
         }

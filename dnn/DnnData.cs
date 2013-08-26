@@ -36,9 +36,7 @@ namespace dnn
             //input and output node values
             this.hOutputs = new double[Props.NumHidden];
             this.inputs = new double[Props.NumInput];
-            this.outputs = new double[Props.NumOutput];
-
-            this.InitializeWeights(Props.Rng, Props.InitWeightMin, Props.InitWeightMax);
+            this.outputs = new double[Props.NumOutput];            
         }
 
         public bool IsEqual(DnnData other)
