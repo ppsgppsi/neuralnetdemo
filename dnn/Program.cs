@@ -243,9 +243,38 @@ namespace BuildNeuralNetworkDemo
 
         static void RunPsoDnn(double[][] trainData, double[][] testData)
         {
+            var rng = new Random(0);
 
             var dnnPso = new PsoNetwork();
-            dnnPso.BuildNetwork(4, 3, trainData);            
+            var props = new DnnProperties()
+                          {
+                              InitWeightMin = -0.1,
+                              InitWeightMax = 0.1,
+                              NumHidden = 2,
+                              NumInput = 4,
+                              NumOutput = 3,
+                              Rng = rng
+                          };
+
+            var particleProps = new ParticleProperties()
+                                    {
+                                        MaxVDelta = 2.0,
+                                        MinVDelta = -2.0,
+                                        V = 3.0,
+                                        VSelf = 2.0,
+                                        VSocial = 2.0
+                                    };
+
+            var netProps = new PsoNetworkProperties()
+                               {
+                                   DesiredAccuracy = 0.98,
+                                   Iterations = 1000,
+                                   NumNetworks = 11,
+                                   Rng = rng,
+                                   ParticleProps = particleProps
+                               };
+
+            dnnPso.BuildNetwork(netProps, props, trainData);            
             var trainAcc = dnnPso.Network.Accuracy(trainData);
             var testAcc = dnnPso.Network.Accuracy(testData);
             double[] weights = dnnPso.Network.Data.GetWeights();

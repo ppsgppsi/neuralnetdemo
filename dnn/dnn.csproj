@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dnn.cs" />
+    <Compile Include="DnnData.cs" />
+    <Compile Include="DnnProperties.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PsoNetwork.cs" />

@@ -1,22 +1,26 @@
 ﻿namespace dnn
 {
-    using System;    
+    using System;
+    
+    public class PsoNetworkProperties
+    {
+        public int NumNetworks { get; set; }
+        public int Iterations { get; set; }
+        public double DesiredAccuracy { get; set; }
+        public ParticleProperties ParticleProps { get; set;}
+        public Random Rng { get; set; }               
+    }
 
     public class PsoNetwork
     {        
-        public Dnn BuildNetwork(int numInput, int numOutput, double[][] trainData)
-        {
-            var numNetworks = 10;
-            var iterations = 1000;
-            var goodEnough = 0.98;
-            var particles = new PsoParticle[numNetworks];
-            var rnd = new Random(0);
+        public Dnn BuildNetwork(PsoNetworkProperties netProps, DnnProperties props, double[][] trainData)
+        {           
+            var particles = new PsoParticle[netProps.NumNetworks];            
 
-            for (int i = 0; i < numNetworks; i++)
+            for (int i = 0; i < netProps.NumNetworks; i++)
             {
-                var data = new DnnData(numInput, 2, numOutput);  
-                data.InitializeWeights(rnd, -0.1, 0.1);
-                particles[i] = new PsoParticle(new Dnn(data), rnd);
+                var data = new DnnData(props);                  
+                particles[i] = new PsoParticle(new Dnn(data), netProps.ParticleProps, netProps.Rng);
             }           
 
             var foundNetwork = false;            
@@ -33,7 +37,7 @@
                 }
             }
       
-            for (int i = 0; i < iterations; i++)
+            for (int i = 0; i < netProps.Iterations; i++)
             {
                 foreach (var particle in particles)
                 {
@@ -48,7 +52,7 @@
                         this.Network = particles[p].Best.Clone();                       
                         bestAccuracy = accuracy;                    
                     }
-                    if (accuracy > goodEnough)
+                    if (accuracy > netProps.DesiredAccuracy)
                     {
                         foundNetwork = true;
                         break;

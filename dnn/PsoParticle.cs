@@ -2,27 +2,32 @@
 
 namespace dnn
 {
-    class PsoParticle
+    public class ParticleProperties
+    {
+        public double V { get; set; }
+        public double VSelf { get; set; }
+        public double VSocial { get; set; }
+        public double MaxVDelta { get; set; }
+        public double MinVDelta { get; set; }
+    }
+
+    public class PsoParticle
     {
         private double bestAccuracy = 0.0;
         private readonly double[] velocities;
 
-        private double vfactor;
-        private double vfactorP;
-        private double vfactorG;
+        private ParticleProperties props;
 
         private readonly Random rnd;
 
-        public PsoParticle(Dnn dnn, Random rnd)
+        public PsoParticle(Dnn dnn, ParticleProperties props, Random rnd)
         {
             this.Network = dnn;
             var data = dnn.Data;
-            var numvelocities = /*weights: */(data.numInput * data.numHidden) + (data.numHidden * data.numOutput) /*bias: */ + data.numHidden + data.numOutput;
+            var numvelocities = /*weights: */(data.Props.NumInput * data.Props.NumHidden) + (data.Props.NumHidden * data.Props.NumOutput) /*bias: */ + data.Props.NumHidden + data.Props.NumOutput;
             velocities = new double[numvelocities];
             Array.Clear(velocities, 0, numvelocities);
-            vfactor = 2.0;
-            vfactorP = 2.0;
-            vfactorG = 2.0;
+            this.props = props;
             this.rnd = rnd;
         }
 
@@ -69,17 +74,17 @@ namespace dnn
             for (int i = 0; i < len; i++)
             {
                 //calculate new velocity => vfactor*v + vfactorP*random(0,1)*(best - p) + vfactorG*random(0,1)*(socialBest - p) 
-                var velocity = this.vfactor * this.velocities[k]
-                               + (vfactorP * rnd.NextDouble() * (currentBest[i] - current[i]))
-                               + (vfactorG * rnd.NextDouble() * (socialBest[i] - current[i]));
+                var velocity = this.props.V * this.velocities[k]
+                               + (this.props.VSelf * rnd.NextDouble() * (currentBest[i] - current[i]))
+                               + (this.props.VSocial * rnd.NextDouble() * (socialBest[i] - current[i]));
 
-                if (velocity > 2.0)
+                if (velocity > this.props.MaxVDelta)
                 {
-                    velocity = 2.0;
+                    velocity = this.props.MaxVDelta;
                 }
-                else if (velocity < -2.0)
+                else if (velocity < this.props.MinVDelta)
                 {
-                    velocity = -2.0;
+                    velocity = this.props.MinVDelta;
                 }
 
                 //calculate new position => p + v
