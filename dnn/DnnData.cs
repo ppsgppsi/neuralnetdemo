@@ -2,7 +2,9 @@
 using System.Linq;
 
 namespace dnn
-{   
+{
+    using System.Text;
+
     public class DnnData
     {        
         public DnnProperties Props { get; private set; }       
@@ -134,6 +136,44 @@ namespace dnn
             for (int i = 0; i < this.oBiases.Length; ++i)
                 result[k++] = this.oBiases[i];
             return result;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append("numInput = " + this.Props.NumInput + " numHidden = " + this.Props.NumHidden + " numOutput = " + this.Props.NumOutput + "\n\n");
+
+            //ArrayToString(sb, "F2", "inputs:", this.Data.inputs);            
+            MatrixToString(sb, "ihWeights:", this.ihWeights);
+            ArrayToString(sb, "F4", "hBiases:", this.hBiases);
+            //ArrayToString(sb, "F4", "hOutputs:", this.Data.hOutputs);           
+            MatrixToString(sb, "hoWeights:", this.hoWeights);
+            ArrayToString(sb, "F4", "hBiases:", this.oBiases);
+            //ArrayToString(sb, "F4", "outputs:", this.Data.outputs); 
+            return sb.ToString();
+        }
+
+        public static void MatrixToString(StringBuilder sb, string header, double[][] matrix)
+        {
+            sb.Append(header).Append("\n");
+            foreach (var i in matrix)
+            {
+                for (var j = 0; j < i.Length; ++j)
+                {
+                    sb.Append(i[j].ToString("F4")).Append(" ");
+                }
+                sb.Append("\n");
+            }
+            sb.Append("\n");
+        }
+
+        public static void ArrayToString(StringBuilder sb, string format, string header, double[] array)
+        {
+            sb.Append(header).Append("\n");
+            for (var i = 0; i < array.Length; ++i)
+                sb.Append(array[i].ToString(format)).Append(" ");
+            sb.Append("\n\n");
         }
     }
 }

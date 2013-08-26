@@ -23,47 +23,17 @@
             var data = this.Data == null ? null : this.Data.Clone();
             return new Dnn(data);           
         }
-     
-        private static void MatrixToString(StringBuilder sb, string header, double[][] matrix)
-        {
-            sb.Append(header).Append("\n");
-            foreach (var i in matrix)
-            {
-                for (var j = 0; j < i.Length; ++j)
-                {
-                    sb.Append(i[j].ToString("F4")).Append(" ");
-                }
-                sb.Append("\n");
-            }
-            sb.Append("\n");            
-        }
-
-        private static void ArrayToString(StringBuilder sb, string format, string header, double[] array)
-        {
-            sb.Append(header).Append("\n");            
-            for (var i = 0; i < array.Length; ++i)
-                sb.Append(array[i].ToString(format)).Append(" ");
-            sb.Append("\n\n");
-        }
 
         public override string ToString()
         {
             var sb = new StringBuilder();           
             sb.Append("===============================\n");
-            sb.Append("numInput = " + this.Data.Props.NumInput + " numHidden = " + this.Data.Props.NumHidden + " numOutput = " + this.Data.Props.NumOutput + "\n\n");
-
-            //ArrayToString(sb, "F2", "inputs:", this.Data.inputs);            
-            MatrixToString(sb, "ihWeights:", this.Data.ihWeights);          
-            ArrayToString(sb, "F4", "hBiases:", this.Data.hBiases);            
-            //ArrayToString(sb, "F4", "hOutputs:", this.Data.hOutputs);           
-            MatrixToString(sb, "hoWeights:", this.Data.hoWeights);
-            ArrayToString(sb, "F4", "hBiases:", this.Data.oBiases);
-            //ArrayToString(sb, "F4", "outputs:", this.Data.outputs);          
+            sb.Append(this.Data.ToString());       
             sb.Append("===============================\n");
             return sb.ToString();
         }
 
-        private void ComputeOutputs(double[] xValues)
+        public void ComputeOutputs(double[] xValues)
         {
             var props = this.Data.Props;
 
