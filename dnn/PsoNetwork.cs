@@ -10,7 +10,7 @@
         public ParticleProperties ParticleProps { get; set;}                   
     }
 
-    public class PsoNetwork
+    public class PsoNetwork : INeuralNetwork
     {
         public PsoNetworkProperties NetworkProps { get; private set; }
         public DnnProperties DnnProps { get; private set; }
@@ -71,5 +71,15 @@
         }
 
         public Dnn Network { get; private set; }
+
+        public double Accuracy(double[][] data)
+        {
+            return Network.Accuracy(data);
+        }
+
+        public string WeightsAsString()
+        {
+            return Network.Data.WeightsAsString();
+        }
     }
 }

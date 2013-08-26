@@ -28,9 +28,10 @@
 
 namespace dnn
 {
-    using System.Linq;  
+    using System.Linq;
+    using System.Text;
 
-    class NeuralNetworkProgram
+    class NueralNetDemo
     {
         static void Main()
         {
@@ -62,37 +63,54 @@ namespace dnn
                     row[j] = double.Parse(svalues[i++]);
                 }              
             }          
-
-            Console.WriteLine("\nFirst 6 rows of entire 150-item data set:");
-            ShowMatrix(allData, 6, 1, true);
+            
+            var sb = new StringBuilder();
+            ArrayFormatter.Matrix(sb, allData, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
+            Console.WriteLine(sb.ToString());
 
             Console.WriteLine("Creating 80% training and 20% test data matrices");
             double[][] trainData;
             double[][] testData;
             MakeTrainTest(allData, out trainData, out testData);
-
-            Console.WriteLine("\nFirst 5 rows of training data:");
-            ShowMatrix(trainData, 5, 1, true);
-            Console.WriteLine("First 3 rows of test data:");
-            ShowMatrix(testData, 3, 1, true);
+            
+            sb.Clear();
+            ArrayFormatter.Matrix(sb, trainData, 5, 1, true, "\nFirst 5 rows of training data:");
+            Console.WriteLine(sb.ToString());
+            sb.Clear();
+            ArrayFormatter.Matrix(sb, testData, 3, 1, true, "\nFirst 3 rows of test data:");
+            Console.WriteLine(sb.ToString());
 
             Normalize(trainData, new int[] { 0, 1, 2, 3 });
             Normalize(testData, new int[] { 0, 1, 2, 3 });
+            
+            sb.Clear();
+            ArrayFormatter.Matrix(sb, trainData, 5, 1, true, "\nFirst 5 rows of normalized training data:");
+            Console.WriteLine(sb.ToString());          
+            sb.Clear();
+            ArrayFormatter.Matrix(sb, testData, 3, 1, true, "First 3 rows of normalized test data:");
+            Console.Write(sb.ToString());
 
-            Console.WriteLine("\nFirst 5 rows of normalized training data:");
-            ShowMatrix(trainData, 5, 1, true);
-            Console.WriteLine("First 3 rows of normalized test data:");
-            ShowMatrix(testData, 3, 1, true);
+            Console.WriteLine("\nBuilding Neural Networks");
+            Console.Write("Hard-coded tanh function for input-to-hidden and softmax for ");
+            Console.WriteLine("hidden-to-output activations");
 
-            RunBackPropDnn(trainData, testData);
-            RunPsoDnn(trainData, testData);
+            var network = BuildBackPropDnn(trainData);
+            network = BuildPsoDnn(trainData);
+
+            var trainAcc = network.Accuracy(trainData);
+            var testAcc = network.Accuracy(testData);                 
+            Console.WriteLine("PSO Final neural network weights and bias values:");
+            Console.WriteLine(network.WeightsAsString());
+            Console.WriteLine("\nPSO Accuracy on training data = " + trainAcc.ToString("F4"));
+            Console.WriteLine("\nPSO Accuracy on test data = " + testAcc.ToString("F4"));
+            Console.WriteLine("\n\nFinal DNN: {0}", network);
 
             Console.WriteLine("\nEnd Build 2013 neural network demo\n");
             Console.ReadLine();
 
         } // Main
 
-        static void RunPsoDnn(double[][] trainData, double[][] testData)
+        static INeuralNetwork BuildPsoDnn(double[][] trainData)
         {
             var rng = new Random(0);
             
@@ -120,23 +138,12 @@ namespace dnn
                                };
 
             var dnnPso = new PsoNetwork(netProps, props, rng);
-            var network = dnnPso.Build(trainData);
-            
-            var trainAcc = network.Accuracy(trainData);
-            var testAcc = network.Accuracy(testData);
-            double[] weights = network.Data.GetWeights();
-            Console.WriteLine("PSO Final neural network weights and bias values:");
-            ShowVector(weights, 10, 3, true);
-            Console.WriteLine("\nPSO Accuracy on training data = " + trainAcc.ToString("F4"));
-            Console.WriteLine("\nPSO Accuracy on test data = " + testAcc.ToString("F4"));
-            Console.WriteLine("\n\nFinal DNN: {0}", network);
+            dnnPso.Build(trainData);
+            return dnnPso;
         }
 
-        static void RunBackPropDnn(double[][] trainData, double[][] testData)
-        {
-            Console.WriteLine("\nCreating a 4-input, 7-hidden, 3-output neural network");
-            Console.Write("Hard-coded tanh function for input-to-hidden and softmax for ");
-            Console.WriteLine("hidden-to-output activations");
+        static INeuralNetwork BuildBackPropDnn(double[][] trainData)
+        {                        
             var props = new DnnProperties {
                 InitWeightMin = -0.1,
                 InitWeightMax = 0.1,
@@ -157,16 +164,7 @@ namespace dnn
             Console.WriteLine("\nBeginning training using incremental back-propagation\n");
             nn.Train(trainData, maxEpochs, learnRate, momentum, weightDecay);
             Console.WriteLine("Training complete");
-
-            double[] weights = nn.Dnn.Data.GetWeights();
-            Console.WriteLine("Final neural network weights and bias values:");
-            ShowVector(weights, 10, 3, true);
-
-            double trainAcc = nn.Dnn.Accuracy(trainData);
-            Console.WriteLine("\nAccuracy on training data = " + trainAcc.ToString("F4"));
-
-            double testAcc = nn.Dnn.Accuracy(testData);
-            Console.WriteLine("\nAccuracy on test data = " + testAcc.ToString("F4"));
+            return nn;
         }
 
         static void MakeTrainTest(double[][] allData, out double[][] trainData, out double[][] testData)
@@ -232,33 +230,7 @@ namespace dnn
                 for (int i = 0; i < dataMatrix.Length; ++i)
                     dataMatrix[i][col] = (dataMatrix[i][col] - mean) / sd;
             }
-        }
-
-        static void ShowVector(double[] vector, int valsPerRow, int decimals, bool newLine)
-        {
-            for (int i = 0; i < vector.Length; ++i)
-            {
-                if (i % valsPerRow == 0) Console.WriteLine("");
-                Console.Write(vector[i].ToString("F" + decimals).PadLeft(decimals + 4) + " ");
-            }
-            if (newLine == true) Console.WriteLine("");
-        }
-
-        static void ShowMatrix(double[][] matrix, int numRows, int decimals, bool newLine)
-        {
-            for (int i = 0; i < numRows; ++i)
-            {
-                Console.Write(i.ToString().PadLeft(3) + ": ");
-                for (int j = 0; j < matrix[i].Length; ++j)
-                {
-                    if (matrix[i][j] >= 0.0) Console.Write(" "); else Console.Write("-"); ;
-                    Console.Write(Math.Abs(matrix[i][j]).ToString("F" + decimals) + " ");
-                }
-                Console.WriteLine("");
-            }
-            if (newLine == true) Console.WriteLine("");
-        }
-
+        }        
     } // class Program   
 } // ns
 

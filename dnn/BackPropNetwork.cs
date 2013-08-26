@@ -3,7 +3,7 @@
     using System;
     using System.Text;
 
-    public class BackPropNetwork
+    public class BackPropNetwork : INeuralNetwork
     {
         private Random rnd;
 
@@ -36,17 +36,27 @@
 
         public Dnn Dnn { get; private set; }
 
+        public double Accuracy(double[][] data)
+        {
+            return this.Dnn.Accuracy(data);
+        }
+
+        public string WeightsAsString()
+        {
+            return this.Dnn.Data.WeightsAsString();
+        }
+
         public override string ToString() // yikes
         {
             var s = this.Dnn.ToString();
             var sb = new StringBuilder(s);
 
-            DnnData.ArrayToString(sb, "F4", "hGrads:", hGrads);
-            DnnData.ArrayToString(sb, "F4", "oGrads:", oGrads);
-            DnnData.MatrixToString(sb, "ihPrevWeightsDelta:", ihPrevWeightsDelta);
-            DnnData.ArrayToString(sb, "F4", "hPrevBiasesDelta:", hPrevBiasesDelta);
-            DnnData.MatrixToString(sb, "hoPrevWeightsDelta:", hoPrevWeightsDelta);
-            DnnData.ArrayToString(sb, "F4", "oPrevBiasesDelta:", oPrevBiasesDelta);
+            ArrayFormatter.Vector(sb, hGrads, 0, 4, true, "hGrads:");
+            ArrayFormatter.Vector(sb, oGrads, 0, 4, true, "oGrads:");
+            ArrayFormatter.Matrix(sb, ihPrevWeightsDelta, ihPrevWeightsDelta.Length, 4, true, "ihPrevWeightsDelta:");
+            ArrayFormatter.Vector(sb, hPrevBiasesDelta, 0, 4, true,"hPrevBiasesDelta:");
+            ArrayFormatter.Matrix(sb, hoPrevWeightsDelta, hoPrevWeightsDelta.Length, 4, true, "hoPrevWeightsDelta:");
+            ArrayFormatter.Vector(sb, oPrevBiasesDelta, 0, 4, true, "oPrevBiasesDelta:");
 
             return sb.ToString();
         }

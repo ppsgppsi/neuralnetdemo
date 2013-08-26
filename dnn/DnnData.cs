@@ -119,7 +119,7 @@ namespace dnn
             this.SetWeights(initialWeights);
         }
 
-        public double[] GetWeights()
+        public double[] Weights()
         {
             // returns the current set of wweights, presumably after training
             int numWeights = (Props.NumInput * Props.NumHidden) + (Props.NumHidden * Props.NumOutput) + Props.NumHidden + Props.NumOutput;
@@ -138,42 +138,24 @@ namespace dnn
             return result;
         }
 
+        public string WeightsAsString()
+        {
+            var sb = new StringBuilder();           
+            ArrayFormatter.Vector(sb, this.Weights(), 10, 3, true, null);
+            return sb.ToString();
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
 
             sb.Append("numInput = " + this.Props.NumInput + " numHidden = " + this.Props.NumHidden + " numOutput = " + this.Props.NumOutput + "\n\n");
-
-            //ArrayToString(sb, "F2", "inputs:", this.Data.inputs);            
-            MatrixToString(sb, "ihWeights:", this.ihWeights);
-            ArrayToString(sb, "F4", "hBiases:", this.hBiases);
-            //ArrayToString(sb, "F4", "hOutputs:", this.Data.hOutputs);           
-            MatrixToString(sb, "hoWeights:", this.hoWeights);
-            ArrayToString(sb, "F4", "hBiases:", this.oBiases);
-            //ArrayToString(sb, "F4", "outputs:", this.Data.outputs); 
+                   
+            ArrayFormatter.Matrix(sb, this.ihWeights, this.ihWeights.Length, 4, true, "ihWeights:");
+            ArrayFormatter.Vector(sb, this.hBiases, 0, 4, true, "hBiases:");                
+            ArrayFormatter.Matrix(sb, this.hoWeights, this.hoWeights.Length, 4, true, "hoWeights:");
+            ArrayFormatter.Vector(sb, this.oBiases, 0, 4, true, "hBiases:");           
             return sb.ToString();
-        }
-
-        public static void MatrixToString(StringBuilder sb, string header, double[][] matrix)
-        {
-            sb.Append(header).Append("\n");
-            foreach (var i in matrix)
-            {
-                for (var j = 0; j < i.Length; ++j)
-                {
-                    sb.Append(i[j].ToString("F4")).Append(" ");
-                }
-                sb.Append("\n");
-            }
-            sb.Append("\n");
-        }
-
-        public static void ArrayToString(StringBuilder sb, string format, string header, double[] array)
-        {
-            sb.Append(header).Append("\n");
-            for (var i = 0; i < array.Length; ++i)
-                sb.Append(array[i].ToString(format)).Append(" ");
-            sb.Append("\n\n");
-        }
+        }        
     }
 }
