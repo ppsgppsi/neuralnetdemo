@@ -2,8 +2,7 @@
 {
     interface INeuralNetwork
     {
-        double Accuracy(double[][] data);        
-        string ToString();
+        double Accuracy(double[][] data);                
         void Train(double[][] data);
     }
 }
