@@ -15,9 +15,7 @@ namespace dnn
     {
         private double bestAccuracy;
         private readonly double[] velocities;
-
         private readonly ParticleProperties props;
-
         private readonly Random rnd;
 
         public PsoParticle(Dnn dnn, ParticleProperties props, Random rnd)
@@ -95,7 +93,7 @@ namespace dnn
             }
         }
 
-        public double UpdateProgress(double[][] testData)
+        public double UpdatePersonalBest(double[][] testData)
         {
             var accuracy = this.Network.Accuracy(testData);
 

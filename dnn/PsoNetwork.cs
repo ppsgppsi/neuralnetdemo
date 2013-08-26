@@ -14,7 +14,7 @@
     {
         public PsoNetworkProperties NetworkProps { get; private set; }
         public DnnProperties DnnProps { get; private set; }
-        private Random rng;
+        private readonly Random rng;
 
         public PsoNetwork(PsoNetworkProperties netProps, DnnProperties props, Random rng)
         {
@@ -36,7 +36,7 @@
 
             foreach (var particle in particles)
             {
-                var accuracy = particle.UpdateProgress(trainData);
+                var accuracy = particle.UpdatePersonalBest(trainData);
 
                 if (accuracy > bestAccuracy)
                 {
@@ -52,9 +52,9 @@
                     particle.MoveTowards(this.Network);
                 }
 
-                for(var p = 0; p < particles.Length; p++)
+                for (var p = 0; p < particles.Length; p++)
                 {
-                    var accuracy = particles[p].UpdateProgress(trainData);
+                    var accuracy = particles[p].UpdatePersonalBest(trainData);
                     if (accuracy > bestAccuracy)
                     {
                         this.Network = particles[p].Best.Clone();                       

@@ -27,11 +27,11 @@
         private static void MatrixToString(StringBuilder sb, string header, double[][] matrix)
         {
             sb.Append(header).Append("\n");
-            foreach (var t in matrix)
+            foreach (var i in matrix)
             {
-                for (var j = 0; j < t.Length; ++j)
+                for (var j = 0; j < i.Length; ++j)
                 {
-                    sb.Append(t[j].ToString("F4")).Append(" ");
+                    sb.Append(i[j].ToString("F4")).Append(" ");
                 }
                 sb.Append("\n");
             }
@@ -70,8 +70,8 @@
             if (xValues.Length < props.NumInput)
                 throw new Exception("Bad xValues array length");
 
-            double[] hSums = new double[props.NumHidden]; // hidden nodes sums scratch array
-            double[] oSums = new double[props.NumOutput]; // output nodes sums
+            var hSums = new double[props.NumHidden]; // hidden nodes sums scratch array
+            var oSums = new double[props.NumOutput]; // output nodes sums
 
             for (int i = 0; i < props.NumInput; ++i) // copy x-values to inputs
                 this.Data.inputs[i] = xValues[i];
@@ -94,7 +94,7 @@
                 oSums[i] += this.Data.oBiases[i];
 
             Softmax(oSums, this.Data.outputs); // softmax activation does all outputs at once for efficiency                                  
-        } // ComputeOutputs
+        } 
 
         private static double HyperTanFunction(double x)
         {
