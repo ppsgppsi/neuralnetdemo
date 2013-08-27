@@ -30,11 +30,10 @@ namespace Networks
             {                
                 particles[i] = new PsoParticle(new NeuralNetwork(this.NetworkProps, this.rng), this.PsoProps.ParticleProps, this.rng);
             }           
-
-            var foundNetwork = false;            
+                      
             var bestAccuracy = 0.0;           
 
-            for (int i = 0; i < this.PsoProps.Iterations && !foundNetwork; i++)
+            for (int i = 0; i < this.PsoProps.Iterations; i++)
             {                
                 for (var p = 0; p < particles.Length; p++)
                 {
@@ -46,12 +45,11 @@ namespace Networks
                     }
                     if (accuracy > this.PsoProps.DesiredAccuracy)
                     {
-                        foundNetwork = true;
-                        break;
+                        return;
                     }
                 }
 
-                for (var p = 0; p < particles.Length && !foundNetwork; p++)
+                for (var p = 0; p < particles.Length; p++)
                 {
                     particles[p].MoveTowards(this.Network);
                 }
