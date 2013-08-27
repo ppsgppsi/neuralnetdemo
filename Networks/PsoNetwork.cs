@@ -32,26 +32,10 @@ namespace Networks
             }           
 
             var foundNetwork = false;            
-            var bestAccuracy = 0.0;
-
-            foreach (var particle in particles)
-            {
-                var accuracy = particle.UpdatePersonalBest(trainData);
-
-                if (accuracy > bestAccuracy)
-                {
-                    this.Network = particle.Best.Clone();                   
-                    bestAccuracy = accuracy;
-                }
-            }
+            var bestAccuracy = 0.0;           
 
             for (int i = 0; i < this.PsoProps.Iterations && !foundNetwork; i++)
-            {
-                foreach (var particle in particles)
-                {
-                    particle.MoveTowards(this.Network);
-                }
-
+            {                
                 for (var p = 0; p < particles.Length; p++)
                 {
                     var accuracy = particles[p].UpdatePersonalBest(trainData);
@@ -65,7 +49,12 @@ namespace Networks
                         foundNetwork = true;
                         break;
                     }
-                }                           
+                }
+
+                for (var p = 0; p < particles.Length && !foundNetwork; p++)
+                {
+                    particles[p].MoveTowards(this.Network);
+                }
             }            
         }
 
