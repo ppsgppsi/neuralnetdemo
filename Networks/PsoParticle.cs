@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace NueralNetDemo
+namespace Networks
 {
+    using System;
+
     public class ParticleProperties
     {
         public double V { get; set; }
@@ -27,8 +27,8 @@ namespace NueralNetDemo
             this.rnd = rnd;
 
             var numvelocities = /*weights: */(data.Props.NumInput * data.Props.NumHidden) + (data.Props.NumHidden * data.Props.NumOutput) /*bias: */ + data.Props.NumHidden + data.Props.NumOutput;
-            velocities = new double[numvelocities];
-            Array.Clear(velocities, 0, numvelocities);
+            this.velocities = new double[numvelocities];
+            Array.Clear(this.velocities, 0, numvelocities);
         }
 
         private NueralNetwork Network { get; set; }
@@ -75,8 +75,8 @@ namespace NueralNetDemo
             {
                 //calculate new velocity => vfactor*v + vfactorP*random(0,1)*(best - p) + vfactorG*random(0,1)*(socialBest - p) 
                 var velocity = this.props.V * this.velocities[k]
-                               + (this.props.VSelf * rnd.NextDouble() * (currentBest[i] - current[i]))
-                               + (this.props.VSocial * rnd.NextDouble() * (socialBest[i] - current[i]));
+                               + (this.props.VSelf * this.rnd.NextDouble() * (currentBest[i] - current[i]))
+                               + (this.props.VSocial * this.rnd.NextDouble() * (socialBest[i] - current[i]));
 
                 if (velocity > this.props.MaxVDelta)
                 {

@@ -1,7 +1,7 @@
-﻿namespace NueralNetDemo
+namespace Networks
 {
     using System;
-    using System.Text;    
+    using System.Text;
 
     public class NueralNetwork
     {                 

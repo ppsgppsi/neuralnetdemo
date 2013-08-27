@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-
-namespace NueralNetDemo
+namespace Networks
 {
+    using System;
+    using System.Linq;
     using System.Text;
 
     public class NetworkData
@@ -30,15 +29,15 @@ namespace NueralNetDemo
             this.Props = props.Clone();        
             
             //weights
-            this.ihWeights = MakeMatrix(Props.NumInput, Props.NumHidden);
-            this.hBiases = new double[Props.NumHidden];            
-            this.hoWeights = MakeMatrix(Props.NumHidden, Props.NumOutput);
-            this.oBiases = new double[Props.NumOutput];
+            this.ihWeights = MakeMatrix(this.Props.NumInput, this.Props.NumHidden);
+            this.hBiases = new double[this.Props.NumHidden];            
+            this.hoWeights = MakeMatrix(this.Props.NumHidden, this.Props.NumOutput);
+            this.oBiases = new double[this.Props.NumOutput];
 
             //input and output node values
-            this.hOutputs = new double[Props.NumHidden];
-            this.inputs = new double[Props.NumInput];
-            this.outputs = new double[Props.NumOutput];            
+            this.hOutputs = new double[this.Props.NumHidden];
+            this.inputs = new double[this.Props.NumInput];
+            this.outputs = new double[this.Props.NumOutput];            
         }
 
         public bool IsEqual(NetworkData other)
@@ -63,7 +62,7 @@ namespace NueralNetDemo
 
         public NetworkData Clone()
         {
-            var ret = new NetworkData(Props);
+            var ret = new NetworkData(this.Props);
 
             Buffer.BlockCopy(this.hBiases, 0, ret.hBiases, 0, Buffer.ByteLength(this.hBiases));
             Buffer.BlockCopy(this.oBiases, 0, ret.oBiases, 0, Buffer.ByteLength(this.oBiases));
@@ -91,28 +90,28 @@ namespace NueralNetDemo
         public void SetWeights(double[] weights)
         {
             // copy weights and biases in weights[] array to i-h weights, i-h biases, h-o weights, h-o biases
-            int numWeights = (Props.NumInput * Props.NumHidden) + (Props.NumHidden * Props.NumOutput) + Props.NumHidden + Props.NumOutput;
+            int numWeights = (this.Props.NumInput * this.Props.NumHidden) + (this.Props.NumHidden * this.Props.NumOutput) + this.Props.NumHidden + this.Props.NumOutput;
             if (weights.Length != numWeights)
                 throw new Exception("Bad weights array length: ");
 
             int k = 0; // points into weights param
 
-            for (int i = 0; i < Props.NumInput; ++i)
-                for (int j = 0; j < Props.NumHidden; ++j)
+            for (int i = 0; i < this.Props.NumInput; ++i)
+                for (int j = 0; j < this.Props.NumHidden; ++j)
                     this.ihWeights[i][j] = weights[k++];
-            for (int i = 0; i < Props.NumHidden; ++i)
+            for (int i = 0; i < this.Props.NumHidden; ++i)
                 this.hBiases[i] = weights[k++];
-            for (int i = 0; i < Props.NumHidden; ++i)
-                for (int j = 0; j < Props.NumOutput; ++j)
+            for (int i = 0; i < this.Props.NumHidden; ++i)
+                for (int j = 0; j < this.Props.NumOutput; ++j)
                     this.hoWeights[i][j] = weights[k++];
-            for (int i = 0; i < Props.NumOutput; ++i)
+            for (int i = 0; i < this.Props.NumOutput; ++i)
                 this.oBiases[i] = weights[k++];
         }
 
         public void InitializeWeights(Random rnd, double lo, double hi)
         {
             // initialize weights and biases to small random values
-            int numWeights = (Props.NumInput * Props.NumHidden) + (Props.NumHidden * Props.NumOutput) + Props.NumHidden + Props.NumOutput;
+            int numWeights = (this.Props.NumInput * this.Props.NumHidden) + (this.Props.NumHidden * this.Props.NumOutput) + this.Props.NumHidden + this.Props.NumOutput;
             double[] initialWeights = new double[numWeights];
             for (int i = 0; i < initialWeights.Length; ++i)
                 initialWeights[i] = (hi - lo) * rnd.NextDouble() + lo;
@@ -122,7 +121,7 @@ namespace NueralNetDemo
         public double[] Weights()
         {
             // returns the current set of wweights, presumably after training
-            int numWeights = (Props.NumInput * Props.NumHidden) + (Props.NumHidden * Props.NumOutput) + Props.NumHidden + Props.NumOutput;
+            int numWeights = (this.Props.NumInput * this.Props.NumHidden) + (this.Props.NumHidden * this.Props.NumOutput) + this.Props.NumHidden + this.Props.NumOutput;
             double[] result = new double[numWeights];
             int k = 0;
             for (int i = 0; i < this.ihWeights.Length; ++i)

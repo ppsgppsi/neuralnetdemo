@@ -1,4 +1,4 @@
-﻿namespace NueralNetDemo
+namespace Networks
 {
     using System;
     using System.Linq;
@@ -27,7 +27,7 @@
             while (i < svalues.Length)
             {
                 var row = new double[rowLength];
-                Data[i / rowLength] = row;
+                this.Data[i / rowLength] = row;
 
                 for (var j = 0; j < rowLength; j++)
                 {
@@ -44,8 +44,8 @@
             }
             // split allData into 80% trainData and 20% testData
             Random rnd = new Random(0);
-            int totRows = Data.Length;
-            int numCols = Data[0].Length;
+            int totRows = this.Data.Length;
+            int numCols = this.Data[0].Length;
 
             int trainRows = (int)(totRows * training); // hard-coded 80-20 split
             int testRows = totRows - trainRows;
@@ -70,18 +70,18 @@
 
             for (; si < trainRows; ++si) // first rows to train data
             {
-                TrainData[j] = new double[numCols];
+                this.TrainData[j] = new double[numCols];
                 int idx = sequence[si];
-                Array.Copy(Data[idx], TrainData[j], numCols);
+                Array.Copy(this.Data[idx], this.TrainData[j], numCols);
                 ++j;
             }
 
             j = 0; // reset to start of test data
             for (; si < totRows; ++si) // remainder to test data
             {
-                TestData[j] = new double[numCols];
+                this.TestData[j] = new double[numCols];
                 int idx = sequence[si];
-                Array.Copy(Data[idx], TestData[j], numCols);
+                Array.Copy(this.Data[idx], this.TestData[j], numCols);
                 ++j;
             }
         }

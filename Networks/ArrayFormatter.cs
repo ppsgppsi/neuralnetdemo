@@ -1,4 +1,4 @@
-﻿namespace NueralNetDemo
+﻿namespace Networks
 {
     using System;
     using System.Globalization;

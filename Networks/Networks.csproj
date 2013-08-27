@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{138C4E37-B12D-4821-AF15-71DF59FED52F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{C4063372-C703-4797-B507-08A111B06AC7}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NueralNetDemo</RootNamespace>
-    <AssemblyName>NueralNetDemo</AssemblyName>
+    <RootNamespace>Networks</RootNamespace>
+    <AssemblyName>Networks</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,22 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NeuralNetDemo.cs" />
+    <Compile Include="ArrayFormatter.cs" />
+    <Compile Include="BackPropNetwork.cs" />
+    <Compile Include="INeuralNetwork.cs" />
+    <Compile Include="NetworkData.cs" />
+    <Compile Include="NetworkProperties.cs" />
+    <Compile Include="NueralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="irisdata.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Networks\Networks.csproj">
-      <Project>{c4063372-c703-4797-b507-08a111b06ac7}</Project>
-      <Name>Networks</Name>
-    </ProjectReference>
+    <Compile Include="PsoNetwork.cs" />
+    <Compile Include="PsoParticle.cs" />
+    <Compile Include="TrainingData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

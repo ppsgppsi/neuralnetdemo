@@ -1,4 +1,4 @@
-﻿namespace NueralNetDemo
+namespace Networks
 {
     public class NetworkProperties
     {

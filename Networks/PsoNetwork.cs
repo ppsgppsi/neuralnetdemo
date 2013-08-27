@@ -1,4 +1,4 @@
-﻿namespace NueralNetDemo
+namespace Networks
 {
     using System;
 
@@ -73,7 +73,7 @@
 
         public double Accuracy(double[][] data)
         {
-            return Network.Accuracy(data);
+            return this.Network.Accuracy(data);
         }
 
         public override string ToString() // yikes

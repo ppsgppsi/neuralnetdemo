@@ -32,6 +32,8 @@ namespace NueralNetDemo
     using System.Diagnostics;
     using System.Text;
 
+    using Networks;
+
     class NueralNetDemo
     {
         static void Main()

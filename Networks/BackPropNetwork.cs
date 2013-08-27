@@ -1,4 +1,4 @@
-﻿namespace NueralNetDemo
+namespace Networks
 {
     using System;
     using System.Text;
@@ -57,12 +57,12 @@
             var s = this.Network.ToString();
             var sb = new StringBuilder(s);
 
-            ArrayFormatter.Vector(sb, hGrads, 0, 4, true, "hGrads:");
-            ArrayFormatter.Vector(sb, oGrads, 0, 4, true, "oGrads:");
-            ArrayFormatter.Matrix(sb, ihPrevWeightsDelta, ihPrevWeightsDelta.Length, 4, true, "ihPrevWeightsDelta:");
-            ArrayFormatter.Vector(sb, hPrevBiasesDelta, 0, 4, true,"hPrevBiasesDelta:");
-            ArrayFormatter.Matrix(sb, hoPrevWeightsDelta, hoPrevWeightsDelta.Length, 4, true, "hoPrevWeightsDelta:");
-            ArrayFormatter.Vector(sb, oPrevBiasesDelta, 0, 4, true, "oPrevBiasesDelta:");
+            ArrayFormatter.Vector(sb, this.hGrads, 0, 4, true, "hGrads:");
+            ArrayFormatter.Vector(sb, this.oGrads, 0, 4, true, "oGrads:");
+            ArrayFormatter.Matrix(sb, this.ihPrevWeightsDelta, this.ihPrevWeightsDelta.Length, 4, true, "ihPrevWeightsDelta:");
+            ArrayFormatter.Vector(sb, this.hPrevBiasesDelta, 0, 4, true,"hPrevBiasesDelta:");
+            ArrayFormatter.Matrix(sb, this.hoPrevWeightsDelta, this.hoPrevWeightsDelta.Length, 4, true, "hoPrevWeightsDelta:");
+            ArrayFormatter.Vector(sb, this.oPrevBiasesDelta, 0, 4, true, "oPrevBiasesDelta:");
 
             return sb.ToString();
         }
@@ -79,26 +79,26 @@
                 throw new Exception("target values not same Length as output in UpdateWeights");
 
             // 1. compute output gradients
-            for (int i = 0; i < oGrads.Length; ++i)
+            for (int i = 0; i < this.oGrads.Length; ++i)
             {
                 // derivative of softmax = (1 - y) * y (same as log-sigmoid)
                 double derivative = (1 - data.outputs[i]) * data.outputs[i];
                 // 'mean squared error version' includes (1-y)(y) derivative
-                oGrads[i] = derivative * (tValues[i] - data.outputs[i]);
+                this.oGrads[i] = derivative * (tValues[i] - data.outputs[i]);
             }
 
             // 2. compute hidden gradients
-            for (int i = 0; i < hGrads.Length; ++i)
+            for (int i = 0; i < this.hGrads.Length; ++i)
             {
                 // derivative of tanh = (1 - y) * (1 + y)
                 double derivative = (1 - data.hOutputs[i]) * (1 + data.hOutputs[i]);
                 double sum = 0.0;
                 for (int j = 0; j < props.NumOutput; ++j) // each hidden delta is the sum of numOutput terms
                 {
-                    double x = oGrads[j] * data.hoWeights[i][j];
+                    double x = this.oGrads[j] * data.hoWeights[i][j];
                     sum += x;
                 }
-                hGrads[i] = derivative * sum;
+                this.hGrads[i] = derivative * sum;
             }
 
             // 3a. update hidden weights (gradients must be computed right-to-left but weights
@@ -107,23 +107,23 @@
             {
                 for (int j = 0; j < data.ihWeights[0].Length; ++j) // 0..3 (4)
                 {
-                    double delta = learnRate * hGrads[j] * data.inputs[i]; // compute the new delta
+                    double delta = learnRate * this.hGrads[j] * data.inputs[i]; // compute the new delta
                     data.ihWeights[i][j] += delta; // update. note we use '+' instead of '-'. this can be very tricky.
                     // now add momentum using previous delta. on first pass old value will be 0.0 but that's OK.
-                    data.ihWeights[i][j] += momentum * ihPrevWeightsDelta[i][j];
+                    data.ihWeights[i][j] += momentum * this.ihPrevWeightsDelta[i][j];
                     data.ihWeights[i][j] -= (weightDecay * data.ihWeights[i][j]); // weight decay
-                    ihPrevWeightsDelta[i][j] = delta; // don't forget to save the delta for momentum 
+                    this.ihPrevWeightsDelta[i][j] = delta; // don't forget to save the delta for momentum 
                 }
             }
 
             // 3b. update hidden biases
             for (int i = 0; i < data.hBiases.Length; ++i)
             {
-                double delta = learnRate * hGrads[i] * 1.0; // t1.0 is constant input for bias; could leave out
+                double delta = learnRate * this.hGrads[i] * 1.0; // t1.0 is constant input for bias; could leave out
                 data.hBiases[i] += delta;
-                data.hBiases[i] += momentum * hPrevBiasesDelta[i]; // momentum
+                data.hBiases[i] += momentum * this.hPrevBiasesDelta[i]; // momentum
                 data.hBiases[i] -= (weightDecay * data.hBiases[i]); // weight decay
-                hPrevBiasesDelta[i] = delta; // don't forget to save the delta
+                this.hPrevBiasesDelta[i] = delta; // don't forget to save the delta
             }
 
             // 4. update hidden-output weights
@@ -132,22 +132,22 @@
                 for (int j = 0; j < data.hoWeights[0].Length; ++j)
                 {
                     // see above: hOutputs are inputs to the nn outputs
-                    double delta = learnRate * oGrads[j] * data.hOutputs[i];
+                    double delta = learnRate * this.oGrads[j] * data.hOutputs[i];
                     data.hoWeights[i][j] += delta;
-                    data.hoWeights[i][j] += momentum * hoPrevWeightsDelta[i][j]; // momentum
+                    data.hoWeights[i][j] += momentum * this.hoPrevWeightsDelta[i][j]; // momentum
                     data.hoWeights[i][j] -= (weightDecay * data.hoWeights[i][j]); // weight decay
-                    hoPrevWeightsDelta[i][j] = delta; // save
+                    this.hoPrevWeightsDelta[i][j] = delta; // save
                 }
             }
 
             // 4b. update output biases
             for (int i = 0; i < data.oBiases.Length; ++i)
             {
-                double delta = learnRate * oGrads[i] * 1.0;
+                double delta = learnRate * this.oGrads[i] * 1.0;
                 data.oBiases[i] += delta;
-                data.oBiases[i] += momentum * oPrevBiasesDelta[i]; // momentum
+                data.oBiases[i] += momentum * this.oPrevBiasesDelta[i]; // momentum
                 data.oBiases[i] -= (weightDecay * data.oBiases[i]); // weight decay
-                oPrevBiasesDelta[i] = delta; // save
+                this.oPrevBiasesDelta[i] = delta; // save
             }
         } // UpdateWeights
 
@@ -169,7 +169,7 @@
 
             while (epoch < this.backProps.maxEprochs)
             {
-                double mse = MeanSquaredError(trainData);
+                double mse = this.MeanSquaredError(trainData);
                 if (mse < this.backProps.mseStopCondition) break; // consider passing value in as parameter
                 //if (mse < 0.001) break; // consider passing value in as parameter
 
@@ -179,7 +179,7 @@
                     int idx = sequence[i];
                     Array.Copy(trainData[idx], props.NumInput, tValues, 0, props.NumOutput);
                     this.Network.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
-                    UpdateWeights(tValues, this.backProps.learnRate, this.backProps.momentum, this.backProps.weightDecay); // find better weights
+                    this.UpdateWeights(tValues, this.backProps.learnRate, this.backProps.momentum, this.backProps.weightDecay); // find better weights
                 } // each training tuple
                 ++epoch;
             }
