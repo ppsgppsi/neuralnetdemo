@@ -26,7 +26,7 @@
 
 
 
-namespace dnn
+namespace nueraldemo
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -77,7 +77,7 @@ namespace dnn
             Console.WriteLine("\nBuilding Neural Networks");
             Console.WriteLine("Hard-coded tanh function for input-to-hidden and softmax for hidden-to-output activations");
 
-            var networks = new List<INeuralNetwork> { BuildBackPropDnn(), BuildPsoDnn() };
+            var networks = new List<INeuralNetwork> { BuildBackPropNetwork(), BuildPsoNetwork() };
 
             foreach (var network in networks)
             {
@@ -100,9 +100,9 @@ namespace dnn
             Console.ReadLine();
         }      
 
-        static INeuralNetwork BuildPsoDnn()
+        static INeuralNetwork BuildPsoNetwork()
         {           
-            var props = new DnnProperties {
+            var props = new NetworkProperties {
                               InitWeightMin = -0.1,
                               InitWeightMax = 0.1,
                               NumHidden = 2,
@@ -128,9 +128,9 @@ namespace dnn
             return new PsoNetwork(netProps, props, new Random(0));                       
         }
 
-        static INeuralNetwork BuildBackPropDnn()
+        static INeuralNetwork BuildBackPropNetwork()
         {                        
-            var props = new DnnProperties {
+            var props = new NetworkProperties {
                 InitWeightMin = -0.1,
                 InitWeightMax = 0.1,
                 NumHidden = 2,

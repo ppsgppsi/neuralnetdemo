@@ -1,7 +1,6 @@
-﻿namespace dnn
+﻿namespace nueraldemo
 {
     using System;
-    using System.Text;
 
     public class PsoNetworkProperties
     {
@@ -13,23 +12,23 @@
 
     public class PsoNetwork : INeuralNetwork
     {
-        public PsoNetworkProperties NetworkProps { get; private set; }
-        public DnnProperties DnnProps { get; private set; }
+        public PsoNetworkProperties PsoProps { get; private set; }
+        public NetworkProperties NetworkProps { get; private set; }
         private readonly Random rng;
 
-        public PsoNetwork(PsoNetworkProperties netProps, DnnProperties props, Random rng)
+        public PsoNetwork(PsoNetworkProperties netProps, NetworkProperties props, Random rng)
         {
-            this.NetworkProps = netProps;
-            this.DnnProps = props;
+            this.PsoProps = netProps;
+            this.NetworkProps = props;
             this.rng = rng;
         }
         public void Train(double[][] trainData)
         {           
-            var particles = new PsoParticle[NetworkProps.NumNetworks];
+            var particles = new PsoParticle[this.PsoProps.NumNetworks];
 
-            for (int i = 0; i < NetworkProps.NumNetworks; i++)
+            for (int i = 0; i < this.PsoProps.NumNetworks; i++)
             {                
-                particles[i] = new PsoParticle(new Dnn(this.DnnProps, this.rng), NetworkProps.ParticleProps, this.rng);
+                particles[i] = new PsoParticle(new NueralNetwork(this.NetworkProps, this.rng), this.PsoProps.ParticleProps, this.rng);
             }           
 
             var foundNetwork = false;            
@@ -46,7 +45,7 @@
                 }
             }
 
-            for (int i = 0; i < NetworkProps.Iterations && !foundNetwork; i++)
+            for (int i = 0; i < this.PsoProps.Iterations && !foundNetwork; i++)
             {
                 foreach (var particle in particles)
                 {
@@ -61,7 +60,7 @@
                         this.Network = particles[p].Best.Clone();                       
                         bestAccuracy = accuracy;                    
                     }
-                    if (accuracy > NetworkProps.DesiredAccuracy)
+                    if (accuracy > this.PsoProps.DesiredAccuracy)
                     {
                         foundNetwork = true;
                         break;
@@ -70,7 +69,7 @@
             }            
         }
 
-        public Dnn Network { get; private set; }
+        public NueralNetwork Network { get; private set; }
 
         public double Accuracy(double[][] data)
         {

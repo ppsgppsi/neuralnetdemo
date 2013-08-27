@@ -43,9 +43,9 @@
   <ItemGroup>
     <Compile Include="ArrayFormatter.cs" />
     <Compile Include="BackPropNetwork.cs" />
-    <Compile Include="Dnn.cs" />
-    <Compile Include="DnnData.cs" />
-    <Compile Include="DnnProperties.cs" />
+    <Compile Include="NueralNetwork.cs" />
+    <Compile Include="NetworkData.cs" />
+    <Compile Include="NetworkProperties.cs" />
     <Compile Include="INeuralNetwork.cs" />
     <Compile Include="NeuralNetDemo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

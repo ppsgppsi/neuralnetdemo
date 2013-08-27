@@ -1,4 +1,4 @@
-﻿namespace dnn
+﻿namespace nueraldemo
 {
     using System;
     using System.Text;
@@ -28,33 +28,33 @@
         private double[] oPrevBiasesDelta;
 
 
-        public BackPropNetwork(DnnProperties props, BackPropProperties backProps, Random rnd)
+        public BackPropNetwork(NetworkProperties props, BackPropProperties backProps, Random rnd)
         {
             this.rnd = rnd; // for Shuffle()
             this.backProps = backProps;
 
-            this.Dnn = new Dnn(props, rnd);
+            this.Network = new NueralNetwork(props, rnd);
 
             // back-prop related arrays below
             this.hGrads = new double[props.NumHidden];
             this.oGrads = new double[props.NumOutput];
 
-            this.ihPrevWeightsDelta = DnnData.MakeMatrix(props.NumInput, props.NumHidden);
+            this.ihPrevWeightsDelta = NetworkData.MakeMatrix(props.NumInput, props.NumHidden);
             this.hPrevBiasesDelta = new double[props.NumHidden];
-            this.hoPrevWeightsDelta = DnnData.MakeMatrix(props.NumHidden, props.NumOutput);
+            this.hoPrevWeightsDelta = NetworkData.MakeMatrix(props.NumHidden, props.NumOutput);
             this.oPrevBiasesDelta = new double[props.NumOutput];
         }
 
-        public Dnn Dnn { get; private set; }
+        public NueralNetwork Network { get; private set; }
 
         public double Accuracy(double[][] data)
         {
-            return this.Dnn.Accuracy(data);
+            return this.Network.Accuracy(data);
         }     
 
         public override string ToString() // yikes
         {
-            var s = this.Dnn.ToString();
+            var s = this.Network.ToString();
             var sb = new StringBuilder(s);
 
             ArrayFormatter.Vector(sb, hGrads, 0, 4, true, "hGrads:");
@@ -69,7 +69,7 @@
 
         private void UpdateWeights(double[] tValues, double learnRate, double momentum, double weightDecay)
         {
-            var data = this.Dnn.Data;
+            var data = this.Network.Data;
             var props = data.Props;
             // update the weights and biases using back-propagation, with target values, eta (learning rate),
             // alpha (momentum).
@@ -155,7 +155,7 @@
 
         public void Train(double[][] trainData)
         {
-            var props = this.Dnn.Data.Props;
+            var props = this.Network.Data.Props;
             // train a back-prop style NN classifier using learning rate and momentum
             // weight decay reduces the magnitude of a weight value over time unless that value
             // is constantly increased
@@ -178,7 +178,7 @@
                 {
                     int idx = sequence[i];
                     Array.Copy(trainData[idx], props.NumInput, tValues, 0, props.NumOutput);
-                    this.Dnn.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
+                    this.Network.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
                     UpdateWeights(tValues, this.backProps.learnRate, this.backProps.momentum, this.backProps.weightDecay); // find better weights
                 } // each training tuple
                 ++epoch;
@@ -198,7 +198,7 @@
 
         private double MeanSquaredError(double[][] trainData) // used as a training stopping condition
         {
-            var data = this.Dnn.Data;
+            var data = this.Network.Data;
             var props = data.Props;
 
             // average squared error per training tuple
@@ -211,7 +211,7 @@
             {
                 Array.Copy(trainData[i], xValues, props.NumInput);
                 Array.Copy(trainData[i], props.NumInput, tValues, 0, props.NumOutput); // get target values
-                this.Dnn.ComputeOutputs(xValues); // compute output using current weights
+                this.Network.ComputeOutputs(xValues); // compute output using current weights
                 for (int j = 0; j < props.NumOutput; ++j)
                 {
                     double err = tValues[j] - data.outputs[j];

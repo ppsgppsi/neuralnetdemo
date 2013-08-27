@@ -1,27 +1,27 @@
-﻿namespace dnn
+﻿namespace nueraldemo
 {
     using System;
     using System.Text;    
 
-    public class Dnn
+    public class NueralNetwork
     {                 
-        public Dnn(DnnProperties props, Random rng)
+        public NueralNetwork(NetworkProperties props, Random rng)
         {
-            this.Data = new DnnData(props);
+            this.Data = new NetworkData(props);
             this.Data.InitializeWeights(rng, props.InitWeightMin, props.InitWeightMax);
         }
 
-        private Dnn(DnnData data)
+        private NueralNetwork(NetworkData data)
         {
             this.Data = data;
         }
 
-        public DnnData Data { get; private set; }
+        public NetworkData Data { get; private set; }
 
-        public Dnn Clone()
+        public NueralNetwork Clone()
         {
             var data = this.Data == null ? null : this.Data.Clone();
-            return new Dnn(data);           
+            return new NueralNetwork(data);           
         }
 
         public override string ToString()

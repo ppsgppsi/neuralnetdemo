@@ -1,4 +1,4 @@
-﻿namespace dnn
+﻿namespace nueraldemo
 {
     using System;
     using System.Globalization;

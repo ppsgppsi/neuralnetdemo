@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Linq;
 
-namespace dnn
+namespace nueraldemo
 {
     using System.Text;
 
-    public class DnnData
+    public class NetworkData
     {        
-        public DnnProperties Props { get; private set; }       
+        public NetworkProperties Props { get; private set; }       
 
         // ReSharper disable InconsistentNaming
         
-        //The input variables that run this DNN
+        //The input variables that run this Nueral Network
         public readonly double[][] ihWeights; // input-hidden
         public readonly double[] hBiases;
         public readonly double[][] hoWeights; // hidden-output
         public readonly double[] oBiases;
 
-        //The values of each node in the DNN, inputs are given, outputs are computed.
-        //Stored here for performance and historical reasons only, not required to run the DNN.
+        //The values of each node in the Network, inputs are given, outputs are computed.
+        //Stored here for performance and historical reasons only, not required to run the Neural Network.
         public readonly double[] inputs;
         public readonly double[] hOutputs;
         public readonly double[] outputs;
 
         // ReSharper restore InconsistentNaming
 
-        public DnnData(DnnProperties props)
+        public NetworkData(NetworkProperties props)
         {
             this.Props = props.Clone();        
             
@@ -41,7 +41,7 @@ namespace dnn
             this.outputs = new double[Props.NumOutput];            
         }
 
-        public bool IsEqual(DnnData other)
+        public bool IsEqual(NetworkData other)
         {
             if (this.Props.NumInput != other.Props.NumInput) return false;
             if (this.Props.NumHidden != other.Props.NumHidden) return false;
@@ -61,9 +61,9 @@ namespace dnn
             return true;
         }
 
-        public DnnData Clone()
+        public NetworkData Clone()
         {
-            var ret = new DnnData(Props);
+            var ret = new NetworkData(Props);
 
             Buffer.BlockCopy(this.hBiases, 0, ret.hBiases, 0, Buffer.ByteLength(this.hBiases));
             Buffer.BlockCopy(this.oBiases, 0, ret.oBiases, 0, Buffer.ByteLength(this.oBiases));

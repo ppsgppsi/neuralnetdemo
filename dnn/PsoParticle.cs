@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace dnn
+namespace nueraldemo
 {
     public class ParticleProperties
     {
@@ -18,11 +18,11 @@ namespace dnn
         private readonly ParticleProperties props;
         private readonly Random rnd;
 
-        public PsoParticle(Dnn dnn, ParticleProperties props, Random rnd)
+        public PsoParticle(NueralNetwork network, ParticleProperties props, Random rnd)
         {
             this.bestAccuracy = 0.0;
-            this.Network = dnn;
-            var data = dnn.Data;            
+            this.Network = network;
+            var data = network.Data;            
             this.props = props;
             this.rnd = rnd;
 
@@ -31,10 +31,10 @@ namespace dnn
             Array.Clear(velocities, 0, numvelocities);
         }
 
-        private Dnn Network { get; set; }
-        public Dnn Best { get; private set; }
+        private NueralNetwork Network { get; set; }
+        public NueralNetwork Best { get; private set; }
 
-        public void MoveTowards(Dnn socialbest)
+        public void MoveTowards(NueralNetwork socialbest)
         {
             if (null == socialbest)
             {

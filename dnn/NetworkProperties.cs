@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace dnn
+namespace nueraldemo
 {
-    public class DnnProperties
+    public class NetworkProperties
     {
         public int NumInput { get; set; }
         public int NumHidden { get; set; }
@@ -10,9 +10,9 @@ namespace dnn
         public double InitWeightMin { get; set; }
         public double InitWeightMax { get; set; }        
 
-        public DnnProperties Clone()
+        public NetworkProperties Clone()
         {
-            return this.MemberwiseClone() as DnnProperties;
+            return this.MemberwiseClone() as NetworkProperties;
         }
     }
 }
