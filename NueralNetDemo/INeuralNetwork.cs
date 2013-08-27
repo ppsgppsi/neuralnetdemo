@@ -1,4 +1,4 @@
-﻿namespace nueraldemo
+﻿namespace NueralNetDemo
 {
     interface INeuralNetwork
     {

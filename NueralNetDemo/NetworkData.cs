@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace nueraldemo
+namespace NueralNetDemo
 {
     using System.Text;
 

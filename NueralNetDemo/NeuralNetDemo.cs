@@ -26,7 +26,7 @@
 
 
 
-namespace nueraldemo
+namespace NueralNetDemo
 {
     using System.Collections.Generic;
     using System.Diagnostics;

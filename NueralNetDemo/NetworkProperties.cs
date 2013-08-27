@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace nueraldemo
+﻿namespace NueralNetDemo
 {
     public class NetworkProperties
     {

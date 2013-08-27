@@ -1,4 +1,4 @@
-﻿namespace nueraldemo
+﻿namespace NueralNetDemo
 {
     using System;
     using System.Text;
