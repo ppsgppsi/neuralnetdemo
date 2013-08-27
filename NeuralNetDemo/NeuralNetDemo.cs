@@ -123,7 +123,7 @@ namespace NeuralNetDemo
             var netProps = new PsoNetworkProperties {
                                    DesiredAccuracy = 0.98,
                                    Iterations = 1000,
-                                   NumNetworks = 11,                                   
+                                   NumNetworks = 4,                                   
                                    ParticleProps = particleProps
                                };
 
