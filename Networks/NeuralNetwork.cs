@@ -3,25 +3,25 @@ namespace Networks
     using System;
     using System.Text;
 
-    public class NueralNetwork
+    public class NeuralNetwork
     {                 
-        public NueralNetwork(NetworkProperties props, Random rng)
+        public NeuralNetwork(NetworkProperties props, Random rng)
         {
             this.Data = new NetworkData(props);
             this.Data.InitializeWeights(rng, props.InitWeightMin, props.InitWeightMax);
         }
 
-        private NueralNetwork(NetworkData data)
+        private NeuralNetwork(NetworkData data)
         {
             this.Data = data;
         }
 
         public NetworkData Data { get; private set; }
 
-        public NueralNetwork Clone()
+        public NeuralNetwork Clone()
         {
             var data = this.Data == null ? null : this.Data.Clone();
-            return new NueralNetwork(data);           
+            return new NeuralNetwork(data);           
         }
 
         public override string ToString()

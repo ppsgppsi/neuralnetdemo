@@ -26,7 +26,7 @@
 
 
 
-namespace NueralNetDemo
+namespace NeuralNetDemo
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -34,7 +34,7 @@ namespace NueralNetDemo
 
     using Networks;
 
-    class NueralNetDemo
+    class NeuralNetDemo
     {
         static void Main()
         {

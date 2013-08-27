@@ -10,7 +10,7 @@ namespace Networks
 
         // ReSharper disable InconsistentNaming
         
-        //The input variables that run this Nueral Network
+        //The input variables that run this Neural Network
         public readonly double[][] ihWeights; // input-hidden
         public readonly double[] hBiases;
         public readonly double[][] hoWeights; // hidden-output

@@ -28,7 +28,7 @@ namespace Networks
 
             for (int i = 0; i < this.PsoProps.NumNetworks; i++)
             {                
-                particles[i] = new PsoParticle(new NueralNetwork(this.NetworkProps, this.rng), this.PsoProps.ParticleProps, this.rng);
+                particles[i] = new PsoParticle(new NeuralNetwork(this.NetworkProps, this.rng), this.PsoProps.ParticleProps, this.rng);
             }           
 
             var foundNetwork = false;            
@@ -69,7 +69,7 @@ namespace Networks
             }            
         }
 
-        public NueralNetwork Network { get; private set; }
+        public NeuralNetwork Network { get; private set; }
 
         public double Accuracy(double[][] data)
         {

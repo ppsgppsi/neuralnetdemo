@@ -33,7 +33,7 @@ namespace Networks
             this.rnd = rnd; // for Shuffle()
             this.backProps = backProps;
 
-            this.Network = new NueralNetwork(props, rnd);
+            this.Network = new NeuralNetwork(props, rnd);
 
             // back-prop related arrays below
             this.hGrads = new double[props.NumHidden];
@@ -45,7 +45,7 @@ namespace Networks
             this.oPrevBiasesDelta = new double[props.NumOutput];
         }
 
-        public NueralNetwork Network { get; private set; }
+        public NeuralNetwork Network { get; private set; }
 
         public double Accuracy(double[][] data)
         {

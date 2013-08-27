@@ -18,7 +18,7 @@ namespace Networks
         private readonly ParticleProperties props;
         private readonly Random rnd;
 
-        public PsoParticle(NueralNetwork network, ParticleProperties props, Random rnd)
+        public PsoParticle(NeuralNetwork network, ParticleProperties props, Random rnd)
         {
             this.bestAccuracy = 0.0;
             this.Network = network;
@@ -31,10 +31,10 @@ namespace Networks
             Array.Clear(this.velocities, 0, numvelocities);
         }
 
-        private NueralNetwork Network { get; set; }
-        public NueralNetwork Best { get; private set; }
+        private NeuralNetwork Network { get; set; }
+        public NeuralNetwork Best { get; private set; }
 
-        public void MoveTowards(NueralNetwork socialbest)
+        public void MoveTowards(NeuralNetwork socialbest)
         {
             if (null == socialbest)
             {
