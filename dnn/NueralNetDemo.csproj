@@ -7,8 +7,8 @@
     <ProjectGuid>{138C4E37-B12D-4821-AF15-71DF59FED52F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>dnn</RootNamespace>
-    <AssemblyName>dnn</AssemblyName>
+    <RootNamespace>NueralNetDemo</RootNamespace>
+    <AssemblyName>NueralNetDemo</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
