@@ -29,6 +29,7 @@
 namespace dnn
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
 
     class NueralNetDemo
@@ -81,8 +82,13 @@ namespace dnn
             foreach (var network in networks)
             {
                 Console.WriteLine("\n\nTraining Network: " + network.GetType());
-                network.Train(allData.TrainData);
-                Console.WriteLine("Training complete");
+                var sw = new Stopwatch();
+                sw.Start();
+                network.Train(allData.TrainData);                
+                var ts = sw.Elapsed;
+                Console.WriteLine(
+                    "Training complete in {0}",
+                    string.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds));
                 var trainAcc = network.Accuracy(allData.TrainData);
                 var testAcc = network.Accuracy(allData.TestData);               
                 Console.WriteLine("\nAccuracy on training data = " + trainAcc.ToString("F4"));
