@@ -26,10 +26,10 @@
             var i = 0;
             while (i < svalues.Length)
             {
-                var row = new double[7];
+                var row = new double[rowLength];
                 Data[i / rowLength] = row;
 
-                for (var j = 0; j < 7; j++)
+                for (var j = 0; j < rowLength; j++)
                 {
                     row[j] = double.Parse(svalues[i++]);
                 }
