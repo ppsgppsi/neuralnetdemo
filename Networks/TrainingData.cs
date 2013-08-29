@@ -42,7 +42,7 @@ namespace Networks
             {
                 throw new ArgumentOutOfRangeException("training", "Must be between 0 and 1");
             }
-            // split allData into 80% trainData and 20% testData
+            // split allData into training% trainData and 1-training% testData
             Random rnd = new Random(0);
             int totRows = this.Data.Length;
             int numCols = this.Data[0].Length;
