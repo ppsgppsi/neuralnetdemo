@@ -64,7 +64,32 @@ namespace Networks
                 oSums[i] += this.Data.oBiases[i];
 
             Softmax(oSums, this.Data.outputs); // softmax activation does all outputs at once for efficiency                                  
-        } 
+        }
+
+        public double Accuracy(double[][] testData)
+        {
+            // percentage correct using winner-takes all
+            int numCorrect = 0;
+            int numWrong = 0;
+
+            if (testData.Length == 0)
+            {
+                throw new ArgumentException("Zero length matrix", "testData");
+            }
+
+            for (int i = 0; i < testData.Length; ++i)
+            {
+                this.ComputeOutputs(testData[i]);
+                int maxIndex = MaxIndex(this.Data.outputs); // which cell in yValues has largest value?
+
+                //remember, testData record format is [input][expectedOutput]
+                if (Math.Abs(testData[i][this.Data.Props.NumInput + maxIndex] - 1.0) < .000001)
+                    ++numCorrect;
+                else
+                    ++numWrong;
+            }
+            return (numCorrect * 1.0) / (numCorrect + numWrong);
+        }
 
         private static double HyperTanFunction(double x)
         {
@@ -89,32 +114,7 @@ namespace Networks
             for (int i = 0; i < oSums.Length; ++i)
                 dest[i] = Math.Exp(oSums[i] - max) / scale;
             // now scaled so that xi sum to 1.0
-        }
-
-        public double Accuracy(double[][] testData)
-        {
-            // percentage correct using winner-takes all
-            int numCorrect = 0;
-            int numWrong = 0;           
-
-            if (testData.Length == 0)
-            {
-                throw new ArgumentException("Zero length matrix", "testData");
-            }
-
-            for (int i = 0; i < testData.Length; ++i)
-            {                                
-                this.ComputeOutputs(testData[i]);
-                int maxIndex = MaxIndex(this.Data.outputs); // which cell in yValues has largest value?
-
-                //remember, testData record format is [input][expectedOutput]
-                if (Math.Abs(testData[i][this.Data.Props.NumInput + maxIndex] - 1.0) < .000001)
-                    ++numCorrect;
-                else
-                    ++numWrong;
-            }
-            return (numCorrect * 1.0) / (numCorrect + numWrong);
-        }
+        }        
 
         private static int MaxIndex(double[] vector) // helper for Accuracy()
         {

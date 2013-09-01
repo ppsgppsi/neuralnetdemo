@@ -319,7 +319,7 @@
       <Rules>
         <Rule Name="AccessModifierMustBeDeclared">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
         <Rule Name="FieldsMustBePrivate">
@@ -389,7 +389,7 @@
       <Rules>
         <Rule Name="ElementMustBeginWithUpperCaseLetter">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
         <Rule Name="ElementMustBeginWithLowerCaseLetter">
@@ -399,7 +399,7 @@
         </Rule>
         <Rule Name="InterfaceNamesMustBeginWithI">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
         <Rule Name="ConstFieldNamesMustBeginWithUpperCaseLetter">
@@ -464,7 +464,7 @@
         </Rule>
         <Rule Name="ElementsMustBeOrderedByAccess">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
         <Rule Name="ConstantsMustAppearBeforeFields">
@@ -549,7 +549,7 @@
         </Rule>
         <Rule Name="PrefixCallsCorrectly">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
         <Rule Name="OpeningParenthesisMustBeOnDeclarationLine">

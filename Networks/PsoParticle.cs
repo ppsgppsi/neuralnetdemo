@@ -16,7 +16,7 @@ namespace Networks
         private double bestAccuracy;
         private readonly double[] velocities;
         private readonly ParticleProperties props;
-        private readonly Random rnd;
+        private readonly Random rnd;        
 
         public PsoParticle(NeuralNetwork network, ParticleProperties props, Random rnd)
         {
@@ -30,9 +30,21 @@ namespace Networks
             this.velocities = new double[numvelocities];
             Array.Clear(this.velocities, 0, numvelocities);
         }
-
-        private NeuralNetwork Network { get; set; }
+        
         public NeuralNetwork Best { get; private set; }
+
+        public double UpdatePersonalBest(double[][] testData)
+        {
+            var accuracy = this.Network.Accuracy(testData);
+
+            if (accuracy > this.bestAccuracy)
+            {
+                this.bestAccuracy = accuracy;
+                this.Best = this.Network.Clone();
+            }
+
+            return accuracy;
+        }
 
         public void MoveTowards(NeuralNetwork socialbest)
         {
@@ -56,6 +68,8 @@ namespace Networks
             this.SwarmMulti(data.hoWeights, bestData.hoWeights, socialBestData.hoWeights, ref k);
             this.Swarm(data.oBiases, bestData.oBiases, socialBestData.oBiases, ref k);
         }
+
+        private NeuralNetwork Network { get; set; }
 
         private void SwarmMulti(double[][] current, double[][] currentBest, double[][] socialBest, ref int k)
         {
@@ -91,19 +105,6 @@ namespace Networks
                 this.velocities[k++] = velocity;
                 current[i] += velocity;
             }
-        }
-
-        public double UpdatePersonalBest(double[][] testData)
-        {
-            var accuracy = this.Network.Accuracy(testData);
-
-            if (accuracy > this.bestAccuracy)
-            {
-                this.bestAccuracy = accuracy;
-                this.Best = this.Network.Clone();
-            }
-
-            return accuracy;
-        }
+        }        
     }
 }

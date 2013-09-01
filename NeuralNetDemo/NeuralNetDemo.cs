@@ -34,9 +34,9 @@ namespace NeuralNetDemo
 
     using Networks;
 
-    class NeuralNetDemo
+    public class NeuralNetDemo
     {
-        static void Main()
+        private static void Main()
         {
             Console.WriteLine("\nBegin Build 2013 neural network demo");
             Console.WriteLine("\nData is the famous Iris flower set.");
@@ -102,7 +102,7 @@ namespace NeuralNetDemo
             Console.ReadLine();
         }      
 
-        static INeuralNetwork BuildPsoNetwork()
+        private static INeuralNetwork BuildPsoNetwork()
         {           
             var props = new NetworkProperties {
                               InitWeightMin = -0.1,
@@ -130,7 +130,7 @@ namespace NeuralNetDemo
             return new PsoNetwork(netProps, props, new Random(0));                       
         }
 
-        static INeuralNetwork BuildBackPropNetwork()
+        private static INeuralNetwork BuildBackPropNetwork()
         {                        
             var props = new NetworkProperties {
                 InitWeightMin = -0.1,
@@ -142,11 +142,11 @@ namespace NeuralNetDemo
 
             var backProps = new BackPropProperties
                                 {
-                                    learnRate = 0.05,
-                                    maxEprochs = 2000,
-                                    momentum = 0.00,
-                                    weightDecay = 0.000,
-                                    mseStopCondition = 0.020
+                                    LearnRate = 0.05,
+                                    MaxEprochs = 2000,
+                                    Momentum = 0.00,
+                                    WeightDecay = 0.000,
+                                    MseStopCondition = 0.020
                                 };
                   
             return  new BackPropNetwork(props, backProps, new Random(0));                                       

@@ -5,27 +5,27 @@ namespace Networks
 
     public class BackPropProperties
     {
-        public int maxEprochs { get; set; }
-        public double learnRate { get; set; }
-        public double momentum { get; set; }
-        public double weightDecay { get; set; }
-        public double mseStopCondition { get; set; }
+        public int MaxEprochs { get; set; }
+        public double LearnRate { get; set; }
+        public double Momentum { get; set; }
+        public double WeightDecay { get; set; }
+        public double MseStopCondition { get; set; }
     }
 
     public class BackPropNetwork : INeuralNetwork
     {
-        private Random rnd;
-        private BackPropProperties backProps;
+        private readonly Random rnd;
+        private readonly BackPropProperties backProps;
 
         // back-prop specific arrays (these could be local to method UpdateWeights)
-        private double[] oGrads; // output gradients for back-propagation
-        private double[] hGrads; // hidden gradients for back-propagation
+        private readonly double[] oGrads; // output gradients for back-propagation
+        private readonly double[] hGrads; // hidden gradients for back-propagation
 
         // back-prop momentum specific arrays (could be local to method Train)
-        private double[][] ihPrevWeightsDelta;  // for momentum with back-propagation
-        private double[] hPrevBiasesDelta;
-        private double[][] hoPrevWeightsDelta;
-        private double[] oPrevBiasesDelta;
+        private readonly double[][] ihPrevWeightsDelta;  // for momentum with back-propagation
+        private readonly double[] hPrevBiasesDelta;
+        private readonly double[][] hoPrevWeightsDelta;
+        private readonly double[] oPrevBiasesDelta;
 
 
         public BackPropNetwork(NetworkProperties props, BackPropProperties backProps, Random rnd)
@@ -65,6 +65,38 @@ namespace Networks
             ArrayFormatter.Vector(sb, this.oPrevBiasesDelta, 0, 4, true, "oPrevBiasesDelta:");
 
             return sb.ToString();
+        }
+
+        public void Train(double[][] trainData)
+        {
+            var props = this.Network.Data.Props;
+            // train a back-prop style NN classifier using learning rate and momentum
+            // weight decay reduces the magnitude of a weight value over time unless that value
+            // is constantly increased
+            int epoch = 0;
+            double[] tValues = new double[props.NumOutput]; // target values
+
+            int[] sequence = new int[trainData.Length];
+            for (int i = 0; i < sequence.Length; ++i)
+                sequence[i] = i;
+
+
+            while (epoch < this.backProps.MaxEprochs)
+            {
+                double mse = this.MeanSquaredError(trainData);
+                if (mse < this.backProps.MseStopCondition) break; // consider passing value in as parameter
+                //if (mse < 0.001) break; // consider passing value in as parameter
+
+                Shuffle(this.rnd, sequence); // visit each training data in random order
+                for (int i = 0; i < trainData.Length; ++i)
+                {
+                    int idx = sequence[i];
+                    Array.Copy(trainData[idx], props.NumInput, tValues, 0, props.NumOutput);
+                    this.Network.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
+                    this.UpdateWeights(tValues, this.backProps.LearnRate, this.backProps.Momentum, this.backProps.WeightDecay); // find better weights
+                } // each training tuple
+                ++epoch;
+            }
         }
 
         private void UpdateWeights(double[] tValues, double learnRate, double momentum, double weightDecay)
@@ -149,41 +181,7 @@ namespace Networks
                 data.oBiases[i] -= (weightDecay * data.oBiases[i]); // weight decay
                 this.oPrevBiasesDelta[i] = delta; // save
             }
-        } // UpdateWeights
-
-        // ----------------------------------------------------------------------------------------
-
-        public void Train(double[][] trainData)
-        {
-            var props = this.Network.Data.Props;
-            // train a back-prop style NN classifier using learning rate and momentum
-            // weight decay reduces the magnitude of a weight value over time unless that value
-            // is constantly increased
-            int epoch = 0;
-            double[] tValues = new double[props.NumOutput]; // target values
-
-            int[] sequence = new int[trainData.Length];
-            for (int i = 0; i < sequence.Length; ++i)
-                sequence[i] = i;
-
-
-            while (epoch < this.backProps.maxEprochs)
-            {
-                double mse = this.MeanSquaredError(trainData);
-                if (mse < this.backProps.mseStopCondition) break; // consider passing value in as parameter
-                //if (mse < 0.001) break; // consider passing value in as parameter
-
-                Shuffle(this.rnd, sequence); // visit each training data in random order
-                for (int i = 0; i < trainData.Length; ++i)
-                {
-                    int idx = sequence[i];
-                    Array.Copy(trainData[idx], props.NumInput, tValues, 0, props.NumOutput);
-                    this.Network.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
-                    this.UpdateWeights(tValues, this.backProps.learnRate, this.backProps.momentum, this.backProps.weightDecay); // find better weights
-                } // each training tuple
-                ++epoch;
-            }
-        }
+        }        
 
         private static void Shuffle(Random rnd, int[] sequence)
         {
