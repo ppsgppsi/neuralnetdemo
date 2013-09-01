@@ -20,6 +20,10 @@ namespace Networks
 
         public PsoParticle(NeuralNetwork network, ParticleProperties props, Random rnd)
         {
+            if (network == null) throw new ArgumentNullException("network");
+            if (props == null) throw new ArgumentNullException("props");
+            if (rnd == null) throw new ArgumentNullException("rnd");            
+
             this.bestAccuracy = 0.0;
             this.Network = network;
             var data = network.Data;            
@@ -47,12 +51,7 @@ namespace Networks
         }
 
         public void MoveTowards(NeuralNetwork socialbest)
-        {
-            if (null == socialbest)
-            {
-                throw new ArgumentNullException("socialbest");
-            }
-
+        {            
             if (this.Best == null)
             {
                 this.Best = this.Network.Clone();

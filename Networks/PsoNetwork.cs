@@ -18,6 +18,9 @@ namespace Networks
 
         public PsoNetwork(PsoNetworkProperties netProps, NetworkProperties props, Random rng)
         {
+            if (netProps == null) throw new ArgumentNullException("props");
+            if (rng == null) throw new ArgumentNullException("rng");
+
             this.PsoProps = netProps;
             this.NetworkProps = props;
             this.rng = rng;
@@ -63,7 +66,7 @@ namespace Networks
             return this.Network.Accuracy(data);
         }
 
-        public override string ToString() // yikes
+        public override string ToString()
         {
             return this.Network.ToString();           
         }
