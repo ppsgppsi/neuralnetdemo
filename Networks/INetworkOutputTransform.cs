@@ -7,6 +7,8 @@
         int Size { get; }
 
         void Transform(double[] src, double[] dest);
+
+        INetworkOutputTransform Clone();
     }
 
     public class SoftMaxTransform : INetworkOutputTransform
@@ -36,6 +38,11 @@
             }
 
             dest[maxIndex] = 1.0;
+        }
+
+        public INetworkOutputTransform Clone()
+        {
+            return new SoftMaxTransform(this.Size);
         }
 
         private void SoftMax(double[] src, double[] dest)

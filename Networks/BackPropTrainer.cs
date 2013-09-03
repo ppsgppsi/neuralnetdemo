@@ -10,6 +10,11 @@ namespace Networks
         public double Momentum { get; set; }
         public double WeightDecay { get; set; }
         public double MseStopCondition { get; set; }
+
+        public BackPropProperties Clone()
+        {
+            return (BackPropProperties)this.MemberwiseClone();
+        }
     }
 
     public class BackPropTrainer : INetworkTrainer
@@ -27,22 +32,25 @@ namespace Networks
         private readonly double[][] hoPrevWeightsDelta;
         private readonly double[] oPrevBiasesDelta;
 
-
-        public BackPropTrainer(NetworkDataProperties props, BackPropProperties backProps, Random rnd)
+        public BackPropTrainer(NeuralNetworkOptions ops, BackPropProperties backProps, Random rnd)
         {
-            this.rnd = rnd; // for Shuffle()
-            this.backProps = backProps;
+            if (ops == null) { throw new ArgumentNullException("ops"); }
+            if (backProps == null) { throw new ArgumentNullException("backProps");}
 
-            this.Network = new NeuralNetwork(props, rnd);
+            this.backProps = backProps.Clone();
+            this.Network = new NeuralNetwork(ops, rnd);
+            this.rnd = rnd; // for Shuffle()
+
+            var data = ops.DataProperties;
 
             // back-prop related arrays below
-            this.hGrads = new double[props.NumHiddenNodes];
-            this.oGrads = new double[props.NumOutputNodes];
+            this.hGrads = new double[data.NumHiddenNodes];
+            this.oGrads = new double[data.NumOutputNodes];
 
-            this.ihPrevWeightsDelta = NetworkData.MakeMatrix(props.NumInputNodes, props.NumHiddenNodes);
-            this.hPrevBiasesDelta = new double[props.NumHiddenNodes];
-            this.hoPrevWeightsDelta = NetworkData.MakeMatrix(props.NumHiddenNodes, props.NumOutputNodes);
-            this.oPrevBiasesDelta = new double[props.NumOutputNodes];
+            this.ihPrevWeightsDelta = NetworkData.MakeMatrix(data.NumInputNodes, data.NumHiddenNodes);
+            this.hPrevBiasesDelta = new double[data.NumHiddenNodes];
+            this.hoPrevWeightsDelta = NetworkData.MakeMatrix(data.NumHiddenNodes, data.NumOutputNodes);
+            this.oPrevBiasesDelta = new double[data.NumOutputNodes];
         }
 
         public NeuralNetwork Network { get; private set; }
@@ -216,9 +224,7 @@ namespace Networks
                     sumSquaredError += err * err;
                 }
             }
-
             return sumSquaredError / trainData.Length;
         }
-
-    } // NeuralNetwork
+    } 
 }

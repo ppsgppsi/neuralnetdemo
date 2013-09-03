@@ -13,16 +13,17 @@ namespace Networks
     public class PsoTrainer : INetworkTrainer
     {
         public PsoNetworkProperties PsoProps { get; private set; }
-        public NetworkDataProperties NetworkProps { get; private set; }
+        public NeuralNetworkOptions NetworkOptions { get; private set; }
         private readonly Random rng;
 
-        public PsoTrainer(PsoNetworkProperties netProps, NetworkDataProperties props, INetworkOutputTransform outputTransform, Random rng)
+        public PsoTrainer(NeuralNetworkOptions ops, PsoNetworkProperties netProps, Random rng)
         {
-            if (netProps == null) throw new ArgumentNullException("props");
+            if (ops == null) throw new ArgumentNullException("ops");
+            if (netProps == null) throw new ArgumentNullException("netProps");
             if (rng == null) throw new ArgumentNullException("rng");
 
             this.PsoProps = netProps;
-            this.NetworkProps = props;
+            this.NetworkOptions = ops.Clone();
             this.rng = rng;
         }
         public void Train(double[][] trainData)
@@ -31,7 +32,7 @@ namespace Networks
 
             for (int i = 0; i < this.PsoProps.NumNetworks; i++)
             {                
-                particles[i] = new PsoParticle(new NeuralNetwork(this.NetworkProps, this.rng), this.PsoProps.ParticleProps, this.rng);
+                particles[i] = new PsoParticle(new NeuralNetwork(this.NetworkOptions, this.rng), this.PsoProps.ParticleProps, this.rng);
             }           
                       
             var bestAccuracy = 0.0;           

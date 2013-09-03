@@ -34,17 +34,16 @@ namespace NeuralNetDemo
             {
                 inputEncoders[i] = new GaussianNormalizer(reader.RecordCount);
             }
-            var outputEncoder = DataEncodeDecodeFactory.CreateDataEncoder(props.Output, reader.RecordCount);
+
+            var outputEncoder = new OneOfCDummyEncoder(new [] {"setosa", "versicolor", "virginica"});
 
             var allData = new TrainingData();
-            allData.LoadData(reader, inputEncoders, outputEncoder);
-            
-            var sb = new StringBuilder();
+            allData.LoadData(reader, inputEncoders, outputEncoder);            
 
             Console.WriteLine("Creating 80% training and 20% test data matrices");         
             allData.Split(0.8);
-            
-            sb.Clear();
+
+            var sb = new StringBuilder();
             ArrayFormatter.Matrix(sb, allData.TrainData, 5, 1, true, "\nFirst 5 rows of normalized training data:");
             Console.WriteLine(sb.ToString());          
             sb.Clear();
@@ -78,7 +77,7 @@ namespace NeuralNetDemo
         }      
 
         private static INetworkTrainer BuildPsoNetwork()
-        {           
+        {        
             var props = new NetworkDataProperties {
                               InitWeightMin = -0.1,
                               InitWeightMax = 0.1,
@@ -86,6 +85,8 @@ namespace NeuralNetDemo
                               NumInputNodes = 4,
                               NumOutputNodes = 3
                           };
+
+            var options = new NeuralNetworkOptions(props, new SoftMaxTransform(3));
 
             var particleProps = new ParticleProperties {
                                         MaxVDelta = 2.0,
@@ -102,7 +103,7 @@ namespace NeuralNetDemo
                                    ParticleProps = particleProps
                                };
 
-            return new PsoTrainer(netProps, props, new Random(0));                       
+            return new PsoTrainer(options, netProps, new Random(0));                       
         }
 
         private static INetworkTrainer BuildBackPropNetwork()
@@ -115,6 +116,8 @@ namespace NeuralNetDemo
                 NumOutputNodes = 3
             };
 
+            var options = new NeuralNetworkOptions(props, new SoftMaxTransform(3));
+
             var backProps = new BackPropProperties
                                 {
                                     LearnRate = 0.05,
@@ -124,7 +127,7 @@ namespace NeuralNetDemo
                                     MseStopCondition = 0.020
                                 };
                   
-            return  new BackPropTrainer(props, backProps, new Random(0));                                       
+            return  new BackPropTrainer(options, backProps, new Random(0));                                       
         }               
     } 
 }

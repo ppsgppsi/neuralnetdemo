@@ -7,10 +7,19 @@ namespace Networks
     {
         public NeuralNetworkOptions(NetworkDataProperties dataProps, INetworkOutputTransform outputTransform)
         {
-            this.OutputTransform = outputTransform;
+            if (dataProps == null) { throw new ArgumentNullException("dataProps");}
+            if (outputTransform == null) { throw new ArgumentNullException("outputTransform");}
+
+            this.OutputTransform = outputTransform.Clone();
+            this.DataProperties = dataProps.Clone();
         }
         public INetworkOutputTransform OutputTransform { get; private set; }
         public NetworkDataProperties DataProperties { get; private set; }
+
+        public NeuralNetworkOptions Clone()
+        {
+            return new NeuralNetworkOptions(this.DataProperties, this.OutputTransform);
+        }
     }
 
     public class NeuralNetwork
@@ -19,22 +28,24 @@ namespace Networks
 
         public NeuralNetwork(NeuralNetworkOptions options, Random rng)
         {
-            this.options = options;
+            if (null == options) { throw new ArgumentNullException("options");}
+            if (null == rng) { throw new ArgumentNullException("rng");}
+
+            this.options = options.Clone();
             this.Data = new NetworkData(options.DataProperties);
             this.Data.InitializeWeights(rng);
         }
 
-        private NeuralNetwork(NetworkData data)
+        private NeuralNetwork(NeuralNetworkOptions options)
         {
-            this.Data = data;
+            this.options = options.Clone();
         }
 
         public NetworkData Data { get; private set; }
 
         public NeuralNetwork Clone()
         {
-            var data = this.Data == null ? null : this.Data.Clone();
-            return new NeuralNetwork(data);           
+            return new NeuralNetwork(this.options);           
         }
 
         public override string ToString()

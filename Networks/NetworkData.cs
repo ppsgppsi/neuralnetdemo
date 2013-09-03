@@ -40,6 +40,8 @@ namespace Networks
 
         public NetworkData(NetworkDataProperties props)
         {
+            if (props == null) { throw new ArgumentNullException("props");}
+
             this.Props = props.Clone();        
             
             //weights
