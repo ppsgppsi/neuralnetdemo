@@ -1,9 +1,9 @@
 namespace Networks
 {
-    public interface INeuralNetwork
+    public interface INetworkTrainer
     {
         double Accuracy(double[][] data); 
                
-        void Train(double[][] data);
+        void Train(double[][] trainingData);
     }
 }

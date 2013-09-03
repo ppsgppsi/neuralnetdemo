@@ -1,19 +1,25 @@
 ﻿namespace Networks
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public interface INeuralDataEncoder
     {
-        void Add(string datum);
+        void FirstPass(string datum);
+        void FirstPassDone();       
 
-        void FinishedAdding();
+        double[] Encode(string datum);
 
-        double[] EncodedValue(string unencoded);
+        /// <summary>
+        /// Returns the length of the array returned by Encode().
+        /// </summary>        
+        int EncodedLength();
     }
 
-    public interface IOutputDecoder
+    public interface INeuralDataDecoder
     {
-        
+        string Decode(double[] encoded);
     }
 
     public class GaussianNormalizer : INeuralDataEncoder
@@ -25,7 +31,7 @@
 
         private int currentIndex;
 
-        private readonly double[] values;
+        private double[] values;
 
         public GaussianNormalizer(int valueCount)
         {
@@ -37,7 +43,7 @@
             values = new double[valueCount];
         }
 
-        public void Add(string datum)
+        public void FirstPass(string datum)
         {
             if (currentIndex >= this.values.Length) {throw new Exception("Not expecting anymore data in GaussianNormalizer, increase the number of expected values");}            
                             
@@ -45,23 +51,28 @@
 
             this.sum += val;
             values[currentIndex++] = val;
-        }       
+        }
 
         /// <summary>
         /// Normalizes a value based on the data added via Add().
         /// </summary>
-        /// <param name="unencoded"></param>
+        /// <param name="datum"></param>
         /// <returns></returns>
-        public double[] EncodedValue(string unencoded)
+        public double[] Encode(string datum)
         {
-            if (!this.finished) {throw new Exception("GaussianNormalizer: FinishedAdding() has not been called.");}
+            if (!this.finished) {throw new Exception("GaussianNormalizer: FirstPassDone() has not been called.");}
 
-            var val = double.Parse(unencoded);
+            var val = double.Parse(datum);
 
             return new []{(val - this.mean) / this.sd};
         }
 
-        public void FinishedAdding()
+        public int EncodedLength()
+        {
+            return 1;
+        }
+
+        public void FirstPassDone()
         {
             if (this.currentIndex != this.values.Length) { throw new Exception("GuassianNormalizer: Unable to finish adding, expecting more input."); }
 
@@ -81,11 +92,94 @@
             }
 
             this.sd = Math.Sqrt(sdsum / (len - 1));
-            for (var i = 0; i < len; ++i)
-            {
-                this.values[i] = (this.values[i] - this.mean) / this.sd;
-            }
+            this.values = null;
             this.finished = true;
+        }
+    }
+
+    public class EffectsEncoderBase : INeuralDataEncoder, INeuralDataDecoder
+    {
+        private readonly Dictionary<string, double[]> map;
+ 
+        public EffectsEncoderBase(string[] choices, double lastRowVal)
+        {
+            this.map = new Dictionary<string, double[]>(choices.Length);
+            int oneIndex = 0;
+            var max = (double.IsNaN(lastRowVal)) ? (choices.Length) : (choices.Length - 1);
+
+            for (int i=0; i < max; i++)
+            {
+                var val = new double[choices.Length];
+                val[oneIndex++] = 1.0;
+                this.map.Add(choices[i], val);
+            }
+
+            if (!double.IsNaN(lastRowVal))
+            {
+                var lastRow = new double[choices.Length];
+
+                for (int i = 0; i < lastRow.Length; i++)
+                {
+                    lastRow[i] = lastRowVal;
+                }
+
+                this.map.Add(choices[max], lastRow);
+            }
+        }
+        public void FirstPass(string datum)
+        {
+        }
+
+        public void FirstPassDone()
+        {
+        }
+
+        public double[] Encode(string datum)
+        {
+            double[] ret;
+            this.map.TryGetValue(datum, out ret);
+
+            if (ret != null)
+            {
+                var copy = new double[ret.Length];
+                Array.Copy(ret, copy, ret.Length);
+                return copy;
+            }
+
+            return null;
+        }
+
+        public int EncodedLength()
+        {
+            return this.map.Count;
+        }
+
+        public string Decode(double[] encoded)
+        {
+            foreach (var val in this.map)
+            {
+                if (val.Value.SequenceEqual(encoded))
+                {
+                    return val.Key;
+                }
+            }
+            return null;
+        }
+    }
+
+    public class OneOfCDummyEncoder : EffectsEncoderBase
+    {
+        public OneOfCDummyEncoder(string[] choices)
+            :base(choices, double.NaN)
+        {
+        }
+    }
+
+    public class EffectsEncoder : EffectsEncoderBase
+    {
+        public EffectsEncoder(string[] choices)
+            :base(choices, -1.0)
+        {
         }
     }
 }

@@ -40,15 +40,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayFormatter.cs" />
-    <Compile Include="BackPropNetwork.cs" />
+    <Compile Include="BackPropTrainer.cs" />
     <Compile Include="DataEncoder.cs" />
-    <Compile Include="DataEncodeDecodeFactory.cs" />
-    <Compile Include="INeuralNetwork.cs" />
+    <Compile Include="INetworkTrainer.cs" />
     <Compile Include="NetworkData.cs" />
     <Compile Include="NetworkDataProperties.cs" />
+    <Compile Include="INetworkOutputTransform.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PsoNetwork.cs" />
+    <Compile Include="PsoTrainer.cs" />
     <Compile Include="PsoParticle.cs" />
     <Compile Include="TrainingData.cs" />
   </ItemGroup>

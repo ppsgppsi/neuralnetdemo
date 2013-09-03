@@ -3,12 +3,25 @@ namespace Networks
     using System;
     using System.Text;
 
-    public class NeuralNetwork
-    {                 
-        public NeuralNetwork(NetworkDataProperties props, Random rng)
+    public class NeuralNetworkOptions
+    {
+        public NeuralNetworkOptions(NetworkDataProperties dataProps, INetworkOutputTransform outputTransform)
         {
-            this.Data = new NetworkData(props);
-            this.Data.InitializeWeights(rng, props.InitWeightMin, props.InitWeightMax);
+            this.OutputTransform = outputTransform;
+        }
+        public INetworkOutputTransform OutputTransform { get; private set; }
+        public NetworkDataProperties DataProperties { get; private set; }
+    }
+
+    public class NeuralNetwork
+    {
+        private readonly NeuralNetworkOptions options;
+
+        public NeuralNetwork(NeuralNetworkOptions options, Random rng)
+        {
+            this.options = options;
+            this.Data = new NetworkData(options.DataProperties);
+            this.Data.InitializeWeights(rng);
         }
 
         private NeuralNetwork(NetworkData data)
@@ -33,7 +46,7 @@ namespace Networks
             return sb.ToString();
         }
 
-        public void ComputeOutputs(double[] xValues)
+        public double[] ComputeOutputs(double[] xValues)
         {
             var props = this.Data.Props;
 
@@ -63,7 +76,11 @@ namespace Networks
             for (int i = 0; i < props.NumOutputNodes; ++i)  // add biases to input-to-hidden sums
                 oSums[i] += this.Data.oBiases[i];
 
-            Softmax(oSums, this.Data.outputs); // softmax activation does all outputs at once for efficiency                                  
+            this.options.OutputTransform.Transform(oSums, this.Data.outputs); // softmax activation does all outputs at once for efficiency 
+
+            var ret = new double[oSums.Length];
+            Buffer.BlockCopy(oSums, 0, ret, 0, oSums.Length);
+            return ret;
         }
 
         public double Accuracy(double[][] testData)
@@ -77,16 +94,23 @@ namespace Networks
                 throw new ArgumentException("Zero length matrix", "testData");
             }
 
-            for (int i = 0; i < testData.Length; ++i)
+            foreach (var t in testData)
             {
-                this.ComputeOutputs(testData[i]);
-                int maxIndex = MaxIndex(this.Data.outputs); // which cell in yValues has largest value?
+                this.ComputeOutputs(t);
+                int offset = this.Data.Props.NumInputNodes;
+                int outputs = this.Data.Props.NumOutputNodes;
 
-                //remember, testData record format is [input][expectedOutput]
-                if (Math.Abs(testData[i][this.Data.Props.NumInputNodes + maxIndex] - 1.0) < .000000001)
-                    ++numCorrect;
-                else
-                    ++numWrong;
+                for (int j = 0; j < outputs; j++)
+                {
+                    if (Math.Abs(t[offset + j] - this.Data.outputs[j]) < .000000001)
+                    {
+                        numCorrect++;
+                    }
+                    else
+                    {
+                        numWrong++;
+                    }
+                }
             }
             return (numCorrect * 1.0) / (numCorrect + numWrong);
         }
@@ -96,39 +120,6 @@ namespace Networks
             if (x < -20.0) return -1.0; // approximation is correct to 30 decimals
             if (x > 20.0) return 1.0;
             return Math.Tanh(x);
-        }
-
-        private static void Softmax(double[] oSums, double[] dest)
-        {
-            // determine max output sum
-            // does all output nodes at once so scale doesn't have to be re-computed each time
-            double max = oSums[0];
-            for (int i = 0; i < oSums.Length; ++i)
-                if (oSums[i] > max) max = oSums[i];
-
-            // determine scaling factor -- sum of exp(each val - max)
-            double scale = 0.0;
-            for (int i = 0; i < oSums.Length; ++i)
-                scale += Math.Exp(oSums[i] - max);
-            
-            for (int i = 0; i < oSums.Length; ++i)
-                dest[i] = Math.Exp(oSums[i] - max) / scale;
-            // now scaled so that xi sum to 1.0
-        }        
-
-        private static int MaxIndex(double[] vector) // helper for Accuracy()
-        {
-            // index of largest value
-            int bigIndex = 0;
-            double biggestVal = vector[0];
-            for (int i = 0; i < vector.Length; ++i)
-            {
-                if (vector[i] > biggestVal)
-                {
-                    biggestVal = vector[i]; bigIndex = i;
-                }
-            }
-            return bigIndex;
         }
     } 
 }

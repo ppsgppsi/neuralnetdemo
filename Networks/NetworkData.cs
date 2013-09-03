@@ -122,8 +122,11 @@ namespace Networks
                 this.oBiases[i] = weights[k++];
         }
 
-        public void InitializeWeights(Random rnd, double lo, double hi)
+        public void InitializeWeights(Random rnd)
         {
+            var hi = this.Props.InitWeightMax;
+            var lo = this.Props.InitWeightMin;
+
             // initialize weights and biases to small random values
             int numWeights = (this.Props.NumInputNodes * this.Props.NumHiddenNodes) + (this.Props.NumHiddenNodes * this.Props.NumOutputNodes) + this.Props.NumHiddenNodes + this.Props.NumOutputNodes;
             double[] initialWeights = new double[numWeights];

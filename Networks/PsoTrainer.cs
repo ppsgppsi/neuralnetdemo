@@ -10,13 +10,13 @@ namespace Networks
         public ParticleProperties ParticleProps { get; set;}                   
     }
 
-    public class PsoNetwork : INeuralNetwork
+    public class PsoTrainer : INetworkTrainer
     {
         public PsoNetworkProperties PsoProps { get; private set; }
         public NetworkDataProperties NetworkProps { get; private set; }
         private readonly Random rng;
 
-        public PsoNetwork(PsoNetworkProperties netProps, NetworkDataProperties props, Random rng)
+        public PsoTrainer(PsoNetworkProperties netProps, NetworkDataProperties props, INetworkOutputTransform outputTransform, Random rng)
         {
             if (netProps == null) throw new ArgumentNullException("props");
             if (rng == null) throw new ArgumentNullException("rng");

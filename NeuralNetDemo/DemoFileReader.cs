@@ -35,5 +35,10 @@ namespace NeuralNetDemo
 
             return lines[readIndex++].Split(sep, StringSplitOptions.RemoveEmptyEntries);
         }
+
+        public void Reset()
+        {
+            readIndex = 0;
+        }
     }
 }

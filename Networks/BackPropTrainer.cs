@@ -12,7 +12,7 @@ namespace Networks
         public double MseStopCondition { get; set; }
     }
 
-    public class BackPropNetwork : INeuralNetwork
+    public class BackPropTrainer : INetworkTrainer
     {
         private readonly Random rnd;
         private readonly BackPropProperties backProps;
@@ -28,7 +28,7 @@ namespace Networks
         private readonly double[] oPrevBiasesDelta;
 
 
-        public BackPropNetwork(NetworkDataProperties props, BackPropProperties backProps, Random rnd)
+        public BackPropTrainer(NetworkDataProperties props, BackPropProperties backProps, Random rnd)
         {
             this.rnd = rnd; // for Shuffle()
             this.backProps = backProps;

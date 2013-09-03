@@ -1,30 +1,6 @@
 ﻿using System;
 
-// For 2013 Microsoft Build Conference attendees
-// June 25-28, 2013
-// San Francisco, CA
-//
-// This is source for a C# console application.
-// To compile you can 1.) create a new Visual Studio
-// C# console app project named BuildNeuralNetworkDemo
-// then zap away the template code and replace with this code,
-// or 2.) copy this code into notepad, save as NeuralNetworkProgram.cs
-// on your local machine, launch the special VS command shell
-// (it knows where the csc.exe compiler is), cd-navigate to
-// the directory containing the .cs file, type 'csc.exe
-// NeuralNetworkProgram.cs' and hit enter, and then after 
-// the compiler creates NeuralNetworkProgram.exe, you can
-// run from the command line.
-//
-// This is an enhanced neural network. It is fully-connected
-// and feed-forward. The training algorithm is back-propagation
-// with momentum and weight decay. The inpput data is normalized
-// so training is quite fast.
-//
-// You can use this code however you wish subject to the usual disclaimers
-// (use at your own risk, etc.)
-
-
+// Based on original code by Dr. James Mccaffrey. See LICENSE.txt for additional information.
 
 namespace NeuralNetDemo
 {
@@ -45,37 +21,28 @@ namespace NeuralNetDemo
             Console.WriteLine("The goal is to predict species from sepal length, width, petal length, width\n");
 
             Console.WriteLine("Raw data resembles:\n");
-            Console.WriteLine(" 5.1, 3.5, 1.4, 0.2, Iris setosa");
-            Console.WriteLine(" 7.0, 3.2, 4.7, 1.4, Iris versicolor");
-            Console.WriteLine(" 6.3, 3.3, 6.0, 2.5, Iris virginica");
+            Console.WriteLine(" 5.1, 3.5, 1.4, 0.2, setosa");
+            Console.WriteLine(" 7.0, 3.2, 4.7, 1.4, versicolor");
+            Console.WriteLine(" 6.3, 3.3, 6.0, 2.5, virginica");
             Console.WriteLine(" ......\n");
 
-            var inputEncoders = new INeuralDataEncoder[props.Inputs.Count];
+            var reader = new DemoFileReader("irisdata.txt");            
+
+            var inputEncoders = new INeuralDataEncoder[4];
 
             for (int i = 0; i < inputEncoders.Length; ++i)
             {
-                inputEncoders[i] = DataEncodeDecodeFactory.CreateDataEncoder(props.Inputs[i].EncoderType, reader.RecordCount);
+                inputEncoders[i] = new GaussianNormalizer(reader.RecordCount);
             }
             var outputEncoder = DataEncodeDecodeFactory.CreateDataEncoder(props.Output, reader.RecordCount);
 
             var allData = new TrainingData();
-            allData.LoadData("irisdata.txt", 4, 3);
+            allData.LoadData(reader, inputEncoders, outputEncoder);
             
             var sb = new StringBuilder();
-            ArrayFormatter.Matrix(sb, allData.RawData, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
-            Console.WriteLine(sb.ToString());
 
             Console.WriteLine("Creating 80% training and 20% test data matrices");         
             allData.Split(0.8);
-            
-            sb.Clear();
-            ArrayFormatter.Matrix(sb, allData.TrainData, 5, 1, true, "\nFirst 5 rows of training data:");
-            Console.WriteLine(sb.ToString());
-            sb.Clear();
-            ArrayFormatter.Matrix(sb, allData.TestData, 3, 1, true, "\nFirst 3 rows of test data:");
-            Console.WriteLine(sb.ToString());
-
-            allData.NormalizeInputs();            
             
             sb.Clear();
             ArrayFormatter.Matrix(sb, allData.TrainData, 5, 1, true, "\nFirst 5 rows of normalized training data:");
@@ -87,7 +54,7 @@ namespace NeuralNetDemo
             Console.WriteLine("\nBuilding Neural Networks");
             Console.WriteLine("Hard-coded tanh function for input-to-hidden and softmax for hidden-to-output activations");
 
-            var networks = new List<INeuralNetwork> { BuildBackPropNetwork(), BuildPsoNetwork() };
+            var networks = new List<INetworkTrainer> { BuildBackPropNetwork(), BuildPsoNetwork() };
 
             foreach (var network in networks)
             {
@@ -110,7 +77,7 @@ namespace NeuralNetDemo
             Console.ReadLine();
         }      
 
-        private static INeuralNetwork BuildPsoNetwork()
+        private static INetworkTrainer BuildPsoNetwork()
         {           
             var props = new NetworkDataProperties {
                               InitWeightMin = -0.1,
@@ -135,10 +102,10 @@ namespace NeuralNetDemo
                                    ParticleProps = particleProps
                                };
 
-            return new PsoNetwork(netProps, props, new Random(0));                       
+            return new PsoTrainer(netProps, props, new Random(0));                       
         }
 
-        private static INeuralNetwork BuildBackPropNetwork()
+        private static INetworkTrainer BuildBackPropNetwork()
         {                        
             var props = new NetworkDataProperties {
                 InitWeightMin = -0.1,
@@ -157,7 +124,7 @@ namespace NeuralNetDemo
                                     MseStopCondition = 0.020
                                 };
                   
-            return  new BackPropNetwork(props, backProps, new Random(0));                                       
+            return  new BackPropTrainer(props, backProps, new Random(0));                                       
         }               
     } 
 }
