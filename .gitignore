@@ -1,0 +1,6 @@
+obj/
+bin/
+*.Cache
+*.vsp
+*.vspx
+*.suo
