@@ -50,11 +50,19 @@ namespace NeuralNetDemo
             Console.WriteLine(" 6.3, 3.3, 6.0, 2.5, Iris virginica");
             Console.WriteLine(" ......\n");
 
+            var inputEncoders = new INeuralDataEncoder[props.Inputs.Count];
+
+            for (int i = 0; i < inputEncoders.Length; ++i)
+            {
+                inputEncoders[i] = DataEncodeDecodeFactory.CreateDataEncoder(props.Inputs[i].EncoderType, reader.RecordCount);
+            }
+            var outputEncoder = DataEncodeDecodeFactory.CreateDataEncoder(props.Output, reader.RecordCount);
+
             var allData = new TrainingData();
             allData.LoadData("irisdata.txt", 4, 3);
             
             var sb = new StringBuilder();
-            ArrayFormatter.Matrix(sb, allData.Data, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
+            ArrayFormatter.Matrix(sb, allData.RawData, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
             Console.WriteLine(sb.ToString());
 
             Console.WriteLine("Creating 80% training and 20% test data matrices");         
@@ -104,12 +112,12 @@ namespace NeuralNetDemo
 
         private static INeuralNetwork BuildPsoNetwork()
         {           
-            var props = new NetworkProperties {
+            var props = new NetworkDataProperties {
                               InitWeightMin = -0.1,
                               InitWeightMax = 0.1,
-                              NumHidden = 2,
-                              NumInput = 4,
-                              NumOutput = 3
+                              NumHiddenNodes = 2,
+                              NumInputNodes = 4,
+                              NumOutputNodes = 3
                           };
 
             var particleProps = new ParticleProperties {
@@ -132,12 +140,12 @@ namespace NeuralNetDemo
 
         private static INeuralNetwork BuildBackPropNetwork()
         {                        
-            var props = new NetworkProperties {
+            var props = new NetworkDataProperties {
                 InitWeightMin = -0.1,
                 InitWeightMax = 0.1,
-                NumHidden = 2,
-                NumInput = 4,
-                NumOutput = 3
+                NumHiddenNodes = 2,
+                NumInputNodes = 4,
+                NumOutputNodes = 3
             };
 
             var backProps = new BackPropProperties

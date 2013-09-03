@@ -13,10 +13,10 @@ namespace Networks
     public class PsoNetwork : INeuralNetwork
     {
         public PsoNetworkProperties PsoProps { get; private set; }
-        public NetworkProperties NetworkProps { get; private set; }
+        public NetworkDataProperties NetworkProps { get; private set; }
         private readonly Random rng;
 
-        public PsoNetwork(PsoNetworkProperties netProps, NetworkProperties props, Random rng)
+        public PsoNetwork(PsoNetworkProperties netProps, NetworkDataProperties props, Random rng)
         {
             if (netProps == null) throw new ArgumentNullException("props");
             if (rng == null) throw new ArgumentNullException("rng");

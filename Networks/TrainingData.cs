@@ -1,51 +1,55 @@
 namespace Networks
 {
     using System;
-    using System.Linq;
+
+    public interface ITrainingDataReader
+    {
+        int RecordCount { get; }
+        string[] NextRecord();
+    }    
 
     public class TrainingData
-    {
-        public double[][] Data { get; set; }
+    {        
         public double[][] TrainData { get; private set; }
-        public double[][] TestData { get; private set; }
-        public int NumInput { get; private set; }
-        public int NumOutput { get; private set; }
+        public double[][] TestData { get; private set; }       
+        private double[][] RawData { get; set; }   
 
-        public void LoadData(string filename, int numInput, int numOutput)
-        {
-            this.NumInput = numInput;
-            this.NumOutput = numOutput;
+        public void LoadData(ITrainingDataReader reader, INeuralDataEncoder[] inputEncoders, INeuralDataEncoder outputEncoder)
+        {                                    
+            string[] record;
 
-            var sdata = System.IO.File.ReadAllText(filename);
-            var svalues = sdata.Split(new[] { ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Select(sValue => sValue.Trim()).ToArray();
-
-            //format is [inputs,outputs]
-            var rowLength = numInput + numOutput;
-            this.Data = new double[svalues.Length / (rowLength)][];
-
-            var i = 0;
-            while (i < svalues.Length)
+            while ((record = reader.NextRecord()) != null)
             {
-                var row = new double[rowLength];
-                this.Data[i / rowLength] = row;
+                var len = record.Length;
+                if (len != (inputEncoders.Length + 1)) { throw new Exception(string.Format("Failed to input the following record, the number of inputs is not correct: {0}",record.ToString()));}
 
-                for (var j = 0; j < rowLength; j++)
+                for (int j = 0; j < (len-1); j++)
                 {
-                    row[j] = double.Parse(svalues[i++]);
+                    inputEncoders[j].Add(record[j]);
                 }
+                outputEncoder.Add(record[len-1]);
             }
+
+            foreach (var inputEncoder in inputEncoders)
+            {
+                inputEncoder.FinishedAdding();
+            }
+            outputEncoder.FinishedAdding();
+
+            //final normalized/encoded format is an array of doubles: [inputValues][outputValue]
+
         }
 
         public void Split(double training)
         {
-            if (training < 0.0 || training > 1.0)
+            if (training <= 0.0 || training >= 1.0)
             {
                 throw new ArgumentOutOfRangeException("training", "Must be between 0 and 1");
             }
             // split allData into training% trainData and 1-training% testData
-            Random rnd = new Random(0);
-            int totRows = this.Data.Length;
-            int numCols = this.Data[0].Length;
+            var rnd = new Random(0);
+            int totRows = this.RawData.Length;
+            int numCols = this.RawData[0].Length;
 
             int trainRows = (int)(totRows * training); // hard-coded 80-20 split
             int testRows = totRows - trainRows;
@@ -72,7 +76,7 @@ namespace Networks
             {
                 this.TrainData[j] = new double[numCols];
                 int idx = sequence[si];
-                Array.Copy(this.Data[idx], this.TrainData[j], numCols);
+                Array.Copy(this.RawData[idx], this.TrainData[j], numCols);
                 ++j;
             }
 
@@ -81,7 +85,7 @@ namespace Networks
             {
                 this.TestData[j] = new double[numCols];
                 int idx = sequence[si];
-                Array.Copy(this.Data[idx], this.TestData[j], numCols);
+                Array.Copy(this.RawData[idx], this.TestData[j], numCols);
                 ++j;
             }
         }

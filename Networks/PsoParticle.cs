@@ -30,7 +30,7 @@ namespace Networks
             this.props = props;
             this.rnd = rnd;
 
-            var numvelocities = /*weights: */(data.Props.NumInput * data.Props.NumHidden) + (data.Props.NumHidden * data.Props.NumOutput) /*bias: */ + data.Props.NumHidden + data.Props.NumOutput;
+            var numvelocities = /*weights: */(data.Props.NumInputNodes * data.Props.NumHiddenNodes) + (data.Props.NumHiddenNodes * data.Props.NumOutputNodes) /*bias: */ + data.Props.NumHiddenNodes + data.Props.NumOutputNodes;
             this.velocities = new double[numvelocities];
             Array.Clear(this.velocities, 0, numvelocities);
         }

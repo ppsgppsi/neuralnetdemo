@@ -28,7 +28,7 @@ namespace Networks
         private readonly double[] oPrevBiasesDelta;
 
 
-        public BackPropNetwork(NetworkProperties props, BackPropProperties backProps, Random rnd)
+        public BackPropNetwork(NetworkDataProperties props, BackPropProperties backProps, Random rnd)
         {
             this.rnd = rnd; // for Shuffle()
             this.backProps = backProps;
@@ -36,13 +36,13 @@ namespace Networks
             this.Network = new NeuralNetwork(props, rnd);
 
             // back-prop related arrays below
-            this.hGrads = new double[props.NumHidden];
-            this.oGrads = new double[props.NumOutput];
+            this.hGrads = new double[props.NumHiddenNodes];
+            this.oGrads = new double[props.NumOutputNodes];
 
-            this.ihPrevWeightsDelta = NetworkData.MakeMatrix(props.NumInput, props.NumHidden);
-            this.hPrevBiasesDelta = new double[props.NumHidden];
-            this.hoPrevWeightsDelta = NetworkData.MakeMatrix(props.NumHidden, props.NumOutput);
-            this.oPrevBiasesDelta = new double[props.NumOutput];
+            this.ihPrevWeightsDelta = NetworkData.MakeMatrix(props.NumInputNodes, props.NumHiddenNodes);
+            this.hPrevBiasesDelta = new double[props.NumHiddenNodes];
+            this.hoPrevWeightsDelta = NetworkData.MakeMatrix(props.NumHiddenNodes, props.NumOutputNodes);
+            this.oPrevBiasesDelta = new double[props.NumOutputNodes];
         }
 
         public NeuralNetwork Network { get; private set; }
@@ -74,7 +74,7 @@ namespace Networks
             // weight decay reduces the magnitude of a weight value over time unless that value
             // is constantly increased
             int epoch = 0;
-            double[] tValues = new double[props.NumOutput]; // target values
+            double[] tValues = new double[props.NumOutputNodes]; // target values
 
             int[] sequence = new int[trainData.Length];
             for (int i = 0; i < sequence.Length; ++i)
@@ -91,7 +91,7 @@ namespace Networks
                 for (int i = 0; i < trainData.Length; ++i)
                 {
                     int idx = sequence[i];
-                    Array.Copy(trainData[idx], props.NumInput, tValues, 0, props.NumOutput);
+                    Array.Copy(trainData[idx], props.NumInputNodes, tValues, 0, props.NumOutputNodes);
                     this.Network.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
                     this.UpdateWeights(tValues, this.backProps.LearnRate, this.backProps.Momentum, this.backProps.WeightDecay); // find better weights
                 } // each training tuple
@@ -107,7 +107,7 @@ namespace Networks
             // alpha (momentum).
             // assumes that SetWeights and ComputeOutputs have been called and so all the internal arrays
             // and matrices have values (other than 0.0)
-            if (tValues.Length != props.NumOutput)
+            if (tValues.Length != props.NumOutputNodes)
                 throw new Exception("target values not same Length as output in UpdateWeights");
 
             // 1. compute output gradients
@@ -125,7 +125,7 @@ namespace Networks
                 // derivative of tanh = (1 - y) * (1 + y)
                 double derivative = (1 - data.hOutputs[i]) * (1 + data.hOutputs[i]);
                 double sum = 0.0;
-                for (int j = 0; j < props.NumOutput; ++j) // each hidden delta is the sum of numOutput terms
+                for (int j = 0; j < props.NumOutputNodes; ++j) // each hidden delta is the sum of numOutput terms
                 {
                     double x = this.oGrads[j] * data.hoWeights[i][j];
                     sum += x;
@@ -201,16 +201,16 @@ namespace Networks
 
             // average squared error per training tuple
             double sumSquaredError = 0.0;
-            double[] xValues = new double[props.NumInput]; // first numInput values in trainData
-            double[] tValues = new double[props.NumOutput]; // last numOutput values
+            double[] xValues = new double[props.NumInputNodes]; // first numInput values in trainData
+            double[] tValues = new double[props.NumOutputNodes]; // last numOutput values
 
             // walk thru each training case. looks like (6.9 3.2 5.7 2.3) (0 0 1)
             for (int i = 0; i < trainData.Length; ++i)
             {
-                Array.Copy(trainData[i], xValues, props.NumInput);
-                Array.Copy(trainData[i], props.NumInput, tValues, 0, props.NumOutput); // get target values
+                Array.Copy(trainData[i], xValues, props.NumInputNodes);
+                Array.Copy(trainData[i], props.NumInputNodes, tValues, 0, props.NumOutputNodes); // get target values
                 this.Network.ComputeOutputs(xValues); // compute output using current weights
-                for (int j = 0; j < props.NumOutput; ++j)
+                for (int j = 0; j < props.NumOutputNodes; ++j)
                 {
                     double err = tValues[j] - data.outputs[j];
                     sumSquaredError += err * err;

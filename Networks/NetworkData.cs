@@ -4,9 +4,23 @@ namespace Networks
     using System.Linq;
     using System.Text;
 
+    public class NetworkDataProperties
+    {
+        public int NumInputNodes { get; set; }
+        public int NumHiddenNodes { get; set; }
+        public int NumOutputNodes { get; set; }
+        public double InitWeightMin { get; set; }
+        public double InitWeightMax { get; set; }
+
+        public NetworkDataProperties Clone()
+        {
+            return this.MemberwiseClone() as NetworkDataProperties;
+        }
+    }
+
     public class NetworkData
     {        
-        public NetworkProperties Props { get; private set; }       
+        public NetworkDataProperties Props { get; private set; }       
 
         // ReSharper disable InconsistentNaming
         
@@ -24,27 +38,27 @@ namespace Networks
 
         // ReSharper restore InconsistentNaming
 
-        public NetworkData(NetworkProperties props)
+        public NetworkData(NetworkDataProperties props)
         {
             this.Props = props.Clone();        
             
             //weights
-            this.ihWeights = MakeMatrix(this.Props.NumInput, this.Props.NumHidden);
-            this.hBiases = new double[this.Props.NumHidden];            
-            this.hoWeights = MakeMatrix(this.Props.NumHidden, this.Props.NumOutput);
-            this.oBiases = new double[this.Props.NumOutput];
+            this.ihWeights = MakeMatrix(this.Props.NumInputNodes, this.Props.NumHiddenNodes);
+            this.hBiases = new double[this.Props.NumHiddenNodes];            
+            this.hoWeights = MakeMatrix(this.Props.NumHiddenNodes, this.Props.NumOutputNodes);
+            this.oBiases = new double[this.Props.NumOutputNodes];
 
             //input and output node values
-            this.hOutputs = new double[this.Props.NumHidden];
-            this.inputs = new double[this.Props.NumInput];
-            this.outputs = new double[this.Props.NumOutput];            
+            this.hOutputs = new double[this.Props.NumHiddenNodes];
+            this.inputs = new double[this.Props.NumInputNodes];
+            this.outputs = new double[this.Props.NumOutputNodes];            
         }
 
         public bool IsEqual(NetworkData other)
         {
-            if (this.Props.NumInput != other.Props.NumInput) return false;
-            if (this.Props.NumHidden != other.Props.NumHidden) return false;
-            if (this.Props.NumOutput != other.Props.NumOutput) return false;
+            if (this.Props.NumInputNodes != other.Props.NumInputNodes) return false;
+            if (this.Props.NumHiddenNodes != other.Props.NumHiddenNodes) return false;
+            if (this.Props.NumOutputNodes != other.Props.NumOutputNodes) return false;
 
             if (!this.hBiases.SequenceEqual(other.hBiases)) return false;
             if (!this.oBiases.SequenceEqual(other.oBiases)) return false;
@@ -90,28 +104,28 @@ namespace Networks
         public void SetWeights(double[] weights)
         {
             // copy weights and biases in weights[] array to i-h weights, i-h biases, h-o weights, h-o biases
-            int numWeights = (this.Props.NumInput * this.Props.NumHidden) + (this.Props.NumHidden * this.Props.NumOutput) + this.Props.NumHidden + this.Props.NumOutput;
+            int numWeights = (this.Props.NumInputNodes * this.Props.NumHiddenNodes) + (this.Props.NumHiddenNodes * this.Props.NumOutputNodes) + this.Props.NumHiddenNodes + this.Props.NumOutputNodes;
             if (weights.Length != numWeights)
                 throw new Exception("Bad weights array length: ");
 
             int k = 0; // points into weights param
 
-            for (int i = 0; i < this.Props.NumInput; ++i)
-                for (int j = 0; j < this.Props.NumHidden; ++j)
+            for (int i = 0; i < this.Props.NumInputNodes; ++i)
+                for (int j = 0; j < this.Props.NumHiddenNodes; ++j)
                     this.ihWeights[i][j] = weights[k++];
-            for (int i = 0; i < this.Props.NumHidden; ++i)
+            for (int i = 0; i < this.Props.NumHiddenNodes; ++i)
                 this.hBiases[i] = weights[k++];
-            for (int i = 0; i < this.Props.NumHidden; ++i)
-                for (int j = 0; j < this.Props.NumOutput; ++j)
+            for (int i = 0; i < this.Props.NumHiddenNodes; ++i)
+                for (int j = 0; j < this.Props.NumOutputNodes; ++j)
                     this.hoWeights[i][j] = weights[k++];
-            for (int i = 0; i < this.Props.NumOutput; ++i)
+            for (int i = 0; i < this.Props.NumOutputNodes; ++i)
                 this.oBiases[i] = weights[k++];
         }
 
         public void InitializeWeights(Random rnd, double lo, double hi)
         {
             // initialize weights and biases to small random values
-            int numWeights = (this.Props.NumInput * this.Props.NumHidden) + (this.Props.NumHidden * this.Props.NumOutput) + this.Props.NumHidden + this.Props.NumOutput;
+            int numWeights = (this.Props.NumInputNodes * this.Props.NumHiddenNodes) + (this.Props.NumHiddenNodes * this.Props.NumOutputNodes) + this.Props.NumHiddenNodes + this.Props.NumOutputNodes;
             double[] initialWeights = new double[numWeights];
             for (int i = 0; i < initialWeights.Length; ++i)
                 initialWeights[i] = (hi - lo) * rnd.NextDouble() + lo;
@@ -121,7 +135,7 @@ namespace Networks
         public double[] Weights()
         {
             // returns the current set of wweights, presumably after training
-            int numWeights = (this.Props.NumInput * this.Props.NumHidden) + (this.Props.NumHidden * this.Props.NumOutput) + this.Props.NumHidden + this.Props.NumOutput;
+            int numWeights = (this.Props.NumInputNodes * this.Props.NumHiddenNodes) + (this.Props.NumHiddenNodes * this.Props.NumOutputNodes) + this.Props.NumHiddenNodes + this.Props.NumOutputNodes;
             double[] result = new double[numWeights];
             int k = 0;
             for (int i = 0; i < this.ihWeights.Length; ++i)
@@ -141,7 +155,7 @@ namespace Networks
         {
             var sb = new StringBuilder();
 
-            sb.Append("numInput = " + this.Props.NumInput + " numHidden = " + this.Props.NumHidden + " numOutput = " + this.Props.NumOutput + "\n\n");
+            sb.Append("numInput = " + this.Props.NumInputNodes + " numHidden = " + this.Props.NumHiddenNodes + " numOutput = " + this.Props.NumOutputNodes + "\n\n");
                    
             ArrayFormatter.Matrix(sb, this.ihWeights, this.ihWeights.Length, 4, true, "ihWeights:");
             ArrayFormatter.Vector(sb, this.hBiases, 0, 4, true, "hBiases:");                

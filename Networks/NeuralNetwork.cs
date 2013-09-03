@@ -5,7 +5,7 @@ namespace Networks
 
     public class NeuralNetwork
     {                 
-        public NeuralNetwork(NetworkProperties props, Random rng)
+        public NeuralNetwork(NetworkDataProperties props, Random rng)
         {
             this.Data = new NetworkData(props);
             this.Data.InitializeWeights(rng, props.InitWeightMin, props.InitWeightMax);
@@ -37,30 +37,30 @@ namespace Networks
         {
             var props = this.Data.Props;
 
-            if (xValues.Length < props.NumInput)
+            if (xValues.Length < props.NumInputNodes)
                 throw new Exception("Bad xValues array length");
 
-            var hSums = new double[props.NumHidden]; // hidden nodes sums scratch array
-            var oSums = new double[props.NumOutput]; // output nodes sums
+            var hSums = new double[props.NumHiddenNodes]; // hidden nodes sums scratch array
+            var oSums = new double[props.NumOutputNodes]; // output nodes sums
 
-            for (int i = 0; i < props.NumInput; ++i) // copy x-values to inputs
+            for (int i = 0; i < props.NumInputNodes; ++i) // copy x-values to inputs
                 this.Data.inputs[i] = xValues[i];
 
-            for (int j = 0; j < props.NumHidden; ++j)  // compute i-h sum of weights * inputs
-                for (int i = 0; i < props.NumInput; ++i)
+            for (int j = 0; j < props.NumHiddenNodes; ++j)  // compute i-h sum of weights * inputs
+                for (int i = 0; i < props.NumInputNodes; ++i)
                     hSums[j] += this.Data.inputs[i] * this.Data.ihWeights[i][j]; // note +=
 
-            for (int i = 0; i < props.NumHidden; ++i)  // add biases to input-to-hidden sums
+            for (int i = 0; i < props.NumHiddenNodes; ++i)  // add biases to input-to-hidden sums
                 hSums[i] += this.Data.hBiases[i];
 
-            for (int i = 0; i < props.NumHidden; ++i)   // apply activation
+            for (int i = 0; i < props.NumHiddenNodes; ++i)   // apply activation
                 this.Data.hOutputs[i] = HyperTanFunction(hSums[i]); // hard-coded
 
-            for (int j = 0; j < props.NumOutput; ++j)   // compute h-o sum of weights * hOutputs
-                for (int i = 0; i < props.NumHidden; ++i)
+            for (int j = 0; j < props.NumOutputNodes; ++j)   // compute h-o sum of weights * hOutputs
+                for (int i = 0; i < props.NumHiddenNodes; ++i)
                     oSums[j] += this.Data.hOutputs[i] * this.Data.hoWeights[i][j];
 
-            for (int i = 0; i < props.NumOutput; ++i)  // add biases to input-to-hidden sums
+            for (int i = 0; i < props.NumOutputNodes; ++i)  // add biases to input-to-hidden sums
                 oSums[i] += this.Data.oBiases[i];
 
             Softmax(oSums, this.Data.outputs); // softmax activation does all outputs at once for efficiency                                  
@@ -83,7 +83,7 @@ namespace Networks
                 int maxIndex = MaxIndex(this.Data.outputs); // which cell in yValues has largest value?
 
                 //remember, testData record format is [input][expectedOutput]
-                if (Math.Abs(testData[i][this.Data.Props.NumInput + maxIndex] - 1.0) < .000001)
+                if (Math.Abs(testData[i][this.Data.Props.NumInputNodes + maxIndex] - 1.0) < .000000001)
                     ++numCorrect;
                 else
                     ++numWrong;
@@ -130,5 +130,5 @@ namespace Networks
             }
             return bigIndex;
         }
-    } // NeuralNetwork
+    } 
 }
