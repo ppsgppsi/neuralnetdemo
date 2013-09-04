@@ -42,7 +42,7 @@ namespace Networks
             this.Data = data.Clone();
         }
 
-        public NetworkData Data { get; private set; }
+        public NetworkData Data { get; set; }
 
         public NeuralNetwork Clone()
         {
@@ -53,12 +53,12 @@ namespace Networks
         {
             var sb = new StringBuilder();           
             sb.Append("===============================\n");
-            sb.Append(this.Data.ToString());       
+            sb.Append(this.Data);       
             sb.Append("===============================\n");
             return sb.ToString();
         }
 
-        public double[] ComputeOutputs(double[] xValues)
+        public void ComputeOutputs(double[] xValues, double[] finalOutput)
         {
             var props = this.Data.Props;
 
@@ -88,11 +88,7 @@ namespace Networks
             for (int i = 0; i < props.NumOutputNodes; ++i)  // add biases to input-to-hidden sums
                 oSums[i] += this.Data.oBiases[i];
 
-            this.options.OutputTransform.Transform(oSums, this.Data.outputs); // softmax activation does all outputs at once for efficiency 
-
-            var ret = new double[oSums.Length];
-            Buffer.BlockCopy(oSums, 0, ret, 0, oSums.Length);
-            return ret;
+            this.options.OutputTransform.Transform(oSums, this.Data.outputs, finalOutput); 
         }
 
         public double Accuracy(double[][] testData)
@@ -106,22 +102,32 @@ namespace Networks
                 throw new ArgumentException("Zero length matrix", "testData");
             }
 
+            var result = new double[this.Data.Props.NumOutputNodes];
+
             foreach (var t in testData)
             {
-                this.ComputeOutputs(t);
+                this.ComputeOutputs(t, result);
                 int offset = this.Data.Props.NumInputNodes;
                 int outputs = this.Data.Props.NumOutputNodes;
 
+                bool equal = true;
+
                 for (int j = 0; j < outputs; j++)
                 {
-                    if (Math.Abs(t[offset + j] - this.Data.outputs[j]) < .000000001)
+                    if (Math.Abs(t[offset + j] - result[j]) > .000000001)
                     {
-                        numCorrect++;
+                        equal = false;
+                        break;
                     }
-                    else
-                    {
-                        numWrong++;
-                    }
+                }
+
+                if (equal)
+                {
+                    numCorrect++;
+                }
+                else
+                {
+                    numWrong++;
                 }
             }
             return (numCorrect * 1.0) / (numCorrect + numWrong);

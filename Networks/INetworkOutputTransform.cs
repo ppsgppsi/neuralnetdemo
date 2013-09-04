@@ -6,7 +6,7 @@
     {
         int Size { get; }
 
-        void Transform(double[] src, double[] dest);
+        void Transform(double[] src, double[] destIntermediate, double[] destFinal);
 
         INetworkOutputTransform Clone();
     }
@@ -20,24 +20,24 @@
 
         public int Size { get; private set; }
 
-        public void Transform(double[] src, double[] dest)
+        public void Transform(double[] src, double[] destIntermediate, double[] destFinal)
         {
-            this.SoftMax(src, dest);
+            this.SoftMax(src, destIntermediate);
 
             double max = 0.0;
             int maxIndex = 0;
 
-            for (int i = 0; i < dest.Length; i++)
+            for (int i = 0; i < destIntermediate.Length; i++)
             {
-                if (dest[i] > max)
+                if (destIntermediate[i] > max)
                 {
-                    max = dest[i];
+                    max = destIntermediate[i];
                     maxIndex = i;
-                    dest[i] = 0.0;
+                    destFinal[i] = 0.0;
                 }
             }
 
-            dest[maxIndex] = 1.0;
+            destFinal[maxIndex] = 1.0;
         }
 
         public INetworkOutputTransform Clone()

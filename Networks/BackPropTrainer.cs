@@ -88,6 +88,7 @@ namespace Networks
             for (int i = 0; i < sequence.Length; ++i)
                 sequence[i] = i;
 
+            var result = new double[props.NumOutputNodes];
 
             while (epoch < this.backProps.MaxEprochs)
             {
@@ -100,7 +101,7 @@ namespace Networks
                 {
                     int idx = sequence[i];
                     Array.Copy(trainData[idx], props.NumInputNodes, tValues, 0, props.NumOutputNodes);
-                    this.Network.ComputeOutputs(trainData[idx]); // copy xValues in, compute outputs (store them internally)
+                    this.Network.ComputeOutputs(trainData[idx], result); // copy xValues in, compute outputs (store them internally)
                     this.UpdateWeights(tValues, this.backProps.LearnRate, this.backProps.Momentum, this.backProps.WeightDecay); // find better weights
                 } // each training tuple
                 ++epoch;
@@ -212,12 +213,14 @@ namespace Networks
             double[] xValues = new double[props.NumInputNodes]; // first numInput values in trainData
             double[] tValues = new double[props.NumOutputNodes]; // last numOutput values
 
+            var result = new double[props.NumOutputNodes];
+
             // walk thru each training case. looks like (6.9 3.2 5.7 2.3) (0 0 1)
             for (int i = 0; i < trainData.Length; ++i)
             {
                 Array.Copy(trainData[i], xValues, props.NumInputNodes);
                 Array.Copy(trainData[i], props.NumInputNodes, tValues, 0, props.NumOutputNodes); // get target values
-                this.Network.ComputeOutputs(xValues); // compute output using current weights
+                this.Network.ComputeOutputs(xValues, result); // compute output using current weights
                 for (int j = 0; j < props.NumOutputNodes; ++j)
                 {
                     double err = tValues[j] - data.outputs[j];
