@@ -7,7 +7,14 @@ namespace Networks
         public int NumNetworks { get; set; }
         public int Iterations { get; set; }
         public double DesiredAccuracy { get; set; }
-        public ParticleProperties ParticleProps { get; set;}                   
+        public ParticleProperties ParticleProps { get; set;} 
+        
+        public PsoNetworkProperties Clone()
+        {
+            var ret = (PsoNetworkProperties)this.MemberwiseClone();
+            ret.ParticleProps = this.ParticleProps.Clone();
+            return ret;
+        }
     }
 
     public class PsoTrainer : INetworkTrainer
@@ -22,7 +29,7 @@ namespace Networks
             if (netProps == null) throw new ArgumentNullException("netProps");
             if (rng == null) throw new ArgumentNullException("rng");
 
-            this.PsoProps = netProps;
+            this.PsoProps = netProps.Clone();
             this.NetworkOptions = ops.Clone();
             this.rng = rng;
         }

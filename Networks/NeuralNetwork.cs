@@ -36,16 +36,17 @@ namespace Networks
             this.Data.InitializeWeights(rng);
         }
 
-        private NeuralNetwork(NeuralNetworkOptions options)
+        private NeuralNetwork(NeuralNetworkOptions options, NetworkData data)
         {
             this.options = options.Clone();
+            this.Data = data.Clone();
         }
 
         public NetworkData Data { get; private set; }
 
         public NeuralNetwork Clone()
         {
-            return new NeuralNetwork(this.options);           
+            return new NeuralNetwork(this.options, this.Data);           
         }
 
         public override string ToString()

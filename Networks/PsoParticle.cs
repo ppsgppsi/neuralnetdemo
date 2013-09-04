@@ -9,6 +9,11 @@ namespace Networks
         public double VSocial { get; set; }
         public double MaxVDelta { get; set; }
         public double MinVDelta { get; set; }
+
+        public ParticleProperties Clone()
+        {
+            return (ParticleProperties)this.MemberwiseClone();
+        }
     }
 
     public class PsoParticle

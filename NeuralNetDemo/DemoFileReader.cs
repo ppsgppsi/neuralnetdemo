@@ -2,17 +2,20 @@
 
 namespace NeuralNetDemo
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     using Networks;
 
     public class DemoFileReader : ITrainingDataReader
     {
-        private readonly string[] lines;
+        private readonly List<string[]> lines;
 
         private int readIndex;
 
         public DemoFileReader(string filename)
         {
-            lines = System.IO.File.ReadAllLines(filename);
+            lines = this.Parse(filename);
             readIndex = 0;
         }
 
@@ -20,25 +23,42 @@ namespace NeuralNetDemo
         {
             get
             {
-                return lines.Length;
+                return lines.Count;
             }
         }
 
         public string[] NextRecord()
         {
-            if (null == lines || (readIndex >= lines.Length))
+            if (null == this.lines || (this.readIndex >= this.lines.Count))
             {
                 return null;
             }
 
-            char[] sep = { ',' };
-
-            return lines[readIndex++].Split(sep, StringSplitOptions.RemoveEmptyEntries);
+            return this.lines[readIndex++];
         }
 
         public void Reset()
         {
             readIndex = 0;
+        }
+
+        private List<string[]> Parse(string filename)
+        {
+            var ret = new List<string[]>();
+
+            var fileLines = System.IO.File.ReadLines(filename);
+
+            foreach (var fileLine in fileLines)
+            {
+                char[] sep = { ',' };
+                var record = fileLine.Split(sep, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+
+                if (record.Length > 2)
+                {
+                    ret.Add(record);
+                }
+            }
+            return ret;
         }
     }
 }
