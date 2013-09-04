@@ -32,9 +32,9 @@
                 if (destIntermediate[i] > max)
                 {
                     max = destIntermediate[i];
-                    maxIndex = i;
-                    destFinal[i] = 0.0;
+                    maxIndex = i;      
                 }
+                destFinal[i] = 0.0;
             }
 
             destFinal[maxIndex] = 1.0;
