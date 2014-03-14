@@ -11,6 +11,8 @@
 //
 // Justin Matthews: re-organized the code and added a Particle Swarm Optimization training implementation.
 //
+// Barry (ppsgppsi GitBug user) Testing commit
+//
 // This is source for a C# console application.
 // To compile you can 1.) create a new Visual Studio
 // C# console app project named BuildNeuralNetworkDemo
