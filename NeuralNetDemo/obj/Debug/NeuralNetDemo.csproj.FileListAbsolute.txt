@@ -1,0 +1,9 @@
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\bin\Debug\NeuralNetDemo.exe.config
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\bin\Debug\irisdata.txt
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\bin\Debug\NeuralNetDemo.exe
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\bin\Debug\NeuralNetDemo.pdb
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\bin\Debug\Networks.dll
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\bin\Debug\Networks.pdb
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\obj\Debug\NeuralNetDemo.csprojResolveAssemblyReference.cache
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\obj\Debug\NeuralNetDemo.exe
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\NeuralNetDemo\obj\Debug\NeuralNetDemo.pdb

@@ -1,8 +1,15 @@
 ﻿using System;
 
+
+
 // For 2013 Microsoft Build Conference attendees
 // June 25-28, 2013
 // San Francisco, CA
+// Original code at:
+// http://channel9.msdn.com/Events/Build/2013/2-401
+// http://www.quaetrix.com/Build2013.html
+//
+// Justin Matthews: re-organized the code and added a Particle Swarm Optimization training implementation.
 //
 // This is source for a C# console application.
 // To compile you can 1.) create a new Visual Studio

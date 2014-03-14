@@ -1,0 +1,5 @@
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\Networks\bin\Debug\Networks.dll
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\Networks\bin\Debug\Networks.pdb
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\Networks\obj\Debug\Networks.csprojResolveAssemblyReference.cache
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\Networks\obj\Debug\Networks.dll
+C:\Users\Barry\Documents\GitHub\neuralnetdemo\Networks\obj\Debug\Networks.pdb
