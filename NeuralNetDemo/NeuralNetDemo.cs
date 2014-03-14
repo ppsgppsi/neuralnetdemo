@@ -45,6 +45,16 @@ namespace NeuralNetDemo
 
     class NeuralNetDemo
     {
+
+        public static class Globals
+        {
+            public static string outFile = @"C:\1\NN_0312.txt";
+            public static int gNumInput = 4; 
+            public static int gNumOutput = 1;
+            public static int gNumHidden = 3;
+            public static int gMaxIterations = 2000; 
+        }
+
         static void Main()
         {
             Console.WriteLine("\nBegin Build 2013 neural network demo");
@@ -60,7 +70,8 @@ namespace NeuralNetDemo
             Console.WriteLine(" ......\n");
 
             var allData = new TrainingData();
-            allData.LoadData("irisdata.txt", 4, 3);
+            //allData.LoadData("irisdata.txt", 4, 3);
+            allData.LoadDataSQL();
             
             var sb = new StringBuilder();
             ArrayFormatter.Matrix(sb, allData.Data, 6, 1, true, "\nFirst 6 rows of entire 150-item data set:");
@@ -104,7 +115,9 @@ namespace NeuralNetDemo
                 var testAcc = network.Accuracy(allData.TestData);               
                 Console.WriteLine("\nAccuracy on training data = " + trainAcc.ToString("F4"));
                 Console.WriteLine("\nAccuracy on test data = " + testAcc.ToString("F4"));
-                Console.WriteLine("\n\nFinal Network: {0}", network);
+                //Console.WriteLine("\n\nFinal Network: {0}", network);
+
+                //Console.ReadLine();
             }        
 
             Console.WriteLine("\nEnd Build 2013 neural network demo\n");
@@ -116,10 +129,10 @@ namespace NeuralNetDemo
             var props = new NetworkProperties {
                               InitWeightMin = -0.1,
                               InitWeightMax = 0.1,
-                              NumHidden = 2,
-                              NumInput = 4,
-                              NumOutput = 3
-                          };
+                              NumHidden = Globals.gNumHidden,  // orig 2
+                              NumInput = Globals.gNumInput,    // orig 4
+                              NumOutput = Globals.gNumOutput   // orig 3
+            };
 
             var particleProps = new ParticleProperties {
                                         MaxVDelta = 2.0,
@@ -131,7 +144,7 @@ namespace NeuralNetDemo
 
             var netProps = new PsoNetworkProperties {
                                    DesiredAccuracy = 0.98,
-                                   Iterations = 1000,
+                                   Iterations = Globals.gMaxIterations, // orig 1000,
                                    NumNetworks = 4,                                   
                                    ParticleProps = particleProps
                                };
@@ -144,15 +157,15 @@ namespace NeuralNetDemo
             var props = new NetworkProperties {
                 InitWeightMin = -0.1,
                 InitWeightMax = 0.1,
-                NumHidden = 2,
-                NumInput = 4,
-                NumOutput = 3
+                NumHidden = Globals.gNumHidden,  // orig 2
+                NumInput = Globals.gNumInput,    // orig 4
+                NumOutput = Globals.gNumOutput   // orig 3
             };
 
             var backProps = new BackPropProperties
                                 {
                                     learnRate = 0.05,
-                                    maxEprochs = 2000,
+                                    maxEprochs = Globals.gMaxIterations, // orig 2000,
                                     momentum = 0.00,
                                     weightDecay = 0.000,
                                     mseStopCondition = 0.020

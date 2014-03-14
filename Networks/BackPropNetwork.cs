@@ -166,9 +166,14 @@ namespace Networks
             for (int i = 0; i < sequence.Length; ++i)
                 sequence[i] = i;
 
+            double pctComplete = this.backProps.maxEprochs / 10;
 
             while (epoch < this.backProps.maxEprochs)
             {
+                //pctComplete = 10 * (epoch + 1) / this.backProps.maxEprochs;
+                if ((epoch + 1) % pctComplete == 0)
+                    Console.Write((100 * (epoch + 1) / this.backProps.maxEprochs).ToString() + @"%, ");
+
                 double mse = this.MeanSquaredError(trainData);
                 if (mse < this.backProps.mseStopCondition) break; // consider passing value in as parameter
                 //if (mse < 0.001) break; // consider passing value in as parameter
@@ -183,6 +188,7 @@ namespace Networks
                 } // each training tuple
                 ++epoch;
             }
+            Console.WriteLine((100 * (epoch + 1) / this.backProps.maxEprochs).ToString() + @"% (training ended)");
         }
 
         private static void Shuffle(Random rnd, int[] sequence)

@@ -11,6 +11,13 @@ namespace Networks
         public int NumInput { get; private set; }
         public int NumOutput { get; private set; }
 
+        public void LoadDataSQL()
+        {
+            var ssd = new SQLServerData();
+            ssd.GetDataset();
+            this.Data = ssd.data_array;
+        }
+
         public void LoadData(string filename, int numInput, int numOutput)
         {
             this.NumInput = numInput;
